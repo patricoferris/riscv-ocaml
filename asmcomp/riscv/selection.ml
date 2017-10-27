@@ -25,10 +25,10 @@ inherit Selectgen.selector_generic as super
 method is_immediate n = is_immediate n
 
 method select_addressing _ = function
-  | Cop(Cadda, [arg; Cconst_int n]) when self#is_immediate n ->
+  | Cop(Cadda, [arg; Cconst_int n], _) when self#is_immediate n ->
       (Iindexed n, arg)
-  | Cop(Cadda, [arg1; Cop(Caddi, [arg2; Cconst_int n])]) when self#is_immediate n ->
-      (Iindexed n, Cop(Caddi, [arg1; arg2]))
+  | Cop(Cadda, [arg1; Cop(Caddi, [arg2; Cconst_int n], _)], dbg) when self#is_immediate n ->
+      (Iindexed n, Cop(Caddi, [arg1; arg2], dbg))
   | arg ->
       (Iindexed 0, arg)
 
