@@ -612,6 +612,7 @@ let data l =
 (* Beginning / end of an assembly file *)
 
 let begin_assembly() =
+  `	.file \"\"\n`; (* PR#7073 *)
   (* Emit the beginning of the segments *)
   let lbl_begin = Compilenv.make_symbol (Some "data_begin") in
   `	{emit_string data_space}\n`;
