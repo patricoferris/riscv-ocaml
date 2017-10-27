@@ -56,13 +56,13 @@ method! select_operation op args dbg =
 (* Instruction selection for conditionals *)
 
 method! select_condition = function
-  | Cop(Ccmpi cmp, args) ->
+  | Cop(Ccmpi cmp, args, _) ->
       (Iinttest(Isigned cmp), Ctuple args)
-  | Cop(Ccmpa cmp, args) ->
+  | Cop(Ccmpa cmp, args, _) ->
       (Iinttest(Iunsigned cmp), Ctuple args)
-  | Cop(Ccmpf cmp, args) ->
+  | Cop(Ccmpf cmp, args, _) ->
       (Ifloattest(cmp, false), Ctuple args)
-  | Cop(Cand, [arg; Cconst_int 1]) ->
+  | Cop(Cand, [arg; Cconst_int 1], _) ->
       (Ioddtest, arg)
   | arg ->
       (Itruetest, arg)
