@@ -47,7 +47,7 @@ dl_defs=''
 verbose=false
 debugruntime=true
 with_sharedlibs=true
-partialld="ld -r"
+partialld=''
 with_debugger=ocamldebugger
 with_ocamldoc=ocamldoc
 with_frame_pointers=false
@@ -678,6 +678,10 @@ else
                      echo "#define ARCH_SIXTYFOUR" >> m.h
                      set 4 4 8 2 8
                      arch64=true;;
+    riscv64-*-linux*) inf "Wow! A 64 bit architecture!"
+                     echo "#define ARCH_SIXTYFOUR" >> m.h
+                     set 4 8 8 2 8
+                     arch64=true;;
     *) err "Since datatype sizes cannot be guessed when cross-compiling,\n" \
            "a hardcoded list is used but your architecture isn't known yet.\n" \
            "You need to determine the sizes yourself.\n" \
@@ -1028,12 +1032,13 @@ esac
 nativeccprofopts=''
 
 case "$arch,$cc,$system,$model" in
-  *,*,rhapsody,*)      if $arch64; then partialld="ld -r -arch ppc64"; fi;;
-  amd64,gcc*,macosx,*) partialld="ld -r -arch x86_64";;
-  amd64,gcc*,solaris,*) partialld="ld -r -m elf_x86_64";;
-  power,gcc*,elf,ppc)   partialld="ld -r -m elf32ppclinux";;
-  power,gcc*,elf,ppc64)   partialld="ld -r -m elf64ppc";;
-  power,gcc*,elf,ppc64le)   partialld="ld -r -m elf64lppc";;
+  *,*,rhapsody,*)      if $arch64; then partialld="${TOOLPREF}ld -r -arch ppc64"; fi;;
+  amd64,gcc*,macosx,*) partialld="${TOOLPREF}ld -r -arch x86_64";;
+  amd64,gcc*,solaris,*) partialld="${TOOLPREF}ld -r -m elf_x86_64";;
+  power,gcc*,elf,ppc)   partialld="${TOOLPREF}ld -r -m elf32ppclinux";;
+  power,gcc*,elf,ppc64)   partialld="${TOOLPREF}ld -r -m elf64ppc";;
+  power,gcc*,elf,ppc64le)   partialld="${TOOLPREF}ld -r -m elf64lppc";;
+  *)                   partialld="${TOOLPREF}ld -r";;
 esac
 
 asppprofflags='-DPROFILING'

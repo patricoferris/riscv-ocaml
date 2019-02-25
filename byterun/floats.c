@@ -59,6 +59,7 @@ CAMLexport void caml_Store_double_val(value val, double dbl)
   union { value v[2]; double d; } buffer;
 
   CAMLassert(sizeof(double) == 2 * sizeof(value));
+  buffer.v[0] = buffer.v[1] = 0;
   buffer.d = dbl;
   Field(val, 0) = buffer.v[0];
   Field(val, 1) = buffer.v[1];
