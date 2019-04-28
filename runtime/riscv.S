@@ -33,8 +33,10 @@
 
 #if defined(__PIC__)
         .option pic
+#define PLT(r) r@plt
 #else
         .option nopic
+#define PLT(r) r
 #endif
 
         .section        .text
@@ -114,7 +116,7 @@ caml_call_gc:
         /* Save trap pointer in case an exception is raised during GC */
         store   TRAP_PTR, caml_exception_pointer, TMP0
         /* Call the garbage collector */
-        call    caml_garbage_collection
+        call    PLT(caml_garbage_collection)
         /* Restore registers */
         load    a0, 0x10(sp)
         load    a1, 0x18(sp)
@@ -213,7 +215,7 @@ caml_raise_exn:
         mv      a1, ra
         mv      a2, sp
         mv      a3, TRAP_PTR
-        call    caml_stash_backtrace
+        call    PLT(caml_stash_backtrace)
         /* Restore exception bucket and raise */
         mv      a0, s2
         j       1b
@@ -244,7 +246,7 @@ caml_raise_exception:
         load    a1, caml_last_return_address
         load    a2, caml_bottom_of_stack
         mv      a3, TRAP_PTR
-        call    caml_stash_backtrace
+        call    PLT(caml_stash_backtrace)
         mv      a0, s2
         j       1b
         .size   caml_raise_exception, .-caml_raise_exception
