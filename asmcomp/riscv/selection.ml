@@ -16,11 +16,25 @@ open Cmm
 open Arch
 open Mach
 
+exception Use_default
+
+let pseudoregs_for_operation op arg res =
+  match op with
+  (* Two-address binary operations: arg.(0) and res.(0) must be the same *)
+    Iintop(Iadd|Isub) ->
+      ([|res.(0); arg.(1)|], res)
+  | Iintop_imm((Iadd|Isub), _) ->
+      ([|res.(0)|], res)
+  (* Other instructions are regular *)
+  | _ -> raise Use_default
+
 (* Instruction selection *)
 
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super
+
+val mutable fastcode_flag = false
 
 method is_immediate n = is_immediate n
 
@@ -66,6 +80,23 @@ method! select_condition = function
       (Ioddtest, arg)
   | arg ->
       (Itruetest, arg)
+
+method! insert_op_debug env op dbg rs rd =
+  if fastcode_flag then super#insert_op_debug env op dbg rs rd
+  else begin
+    match pseudoregs_for_operation op rs rd with
+    | rsrs, rdst ->
+        self#insert_moves env rs rsrs;
+        self#insert_debug env (Iop op) dbg rsrs rdst;
+        self#insert_moves env rdst rd;
+        rd
+    | exception Use_default ->
+        super#insert_op_debug env op dbg rs rd
+  end
+
+method! emit_fundecl f =
+  fastcode_flag <- not (List.mem Reduce_code_size f.fun_codegen_options);
+  super#emit_fundecl f
 end
 
 let fundecl f = (new selector)#emit_fundecl f
