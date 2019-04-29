@@ -376,9 +376,9 @@ let emit_instr i =
       let lbl_redo = new_label () in
       let lbl_call_gc = new_label () in
       `{emit_label lbl_redo}:\n`;
-      `	addi	{emit_reg reg_alloc_ptr}, {emit_reg reg_alloc_ptr}, -{emit_int n}\n`;
-      `	addi	{emit_reg i.res.(0)}, {emit_reg reg_alloc_ptr}, {emit_int size_addr}\n`;
-      `	bltu	{emit_reg reg_alloc_ptr}, {emit_reg reg_alloc_lim}, {emit_label lbl_call_gc}\n`;
+      `	addi	{emit_reg i.res.(0)}, {emit_reg reg_alloc_ptr}, -{emit_int (n - size_addr)}\n`;
+      `	bgeu	{emit_reg reg_alloc_lim}, {emit_reg i.res.(0)}, {emit_label lbl_call_gc}\n`;
+      `	addi	{emit_reg reg_alloc_ptr}, {emit_reg i.res.(0)}, -{emit_int size_addr}\n`;
       call_gc_sites :=
         { gc_lbl = lbl_call_gc;
           gc_return_lbl = lbl_redo;
