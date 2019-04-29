@@ -48,7 +48,7 @@ let slot_offset loc cls =
 (* Output a symbol *)
 
 let emit_symbol s =
-  Emitaux.emit_symbol '.' s
+  emit_symbol '.' s
 
 let emit_jump op s =
   if !Clflags.dlcode || !Clflags.pic_code
@@ -60,10 +60,8 @@ let emit_tail = emit_jump "tail"
 
 (* Output a label *)
 
-let label_prefix = "L"
-
 let emit_label lbl =
-  emit_string label_prefix; emit_int lbl
+  emit_string ".L"; emit_int lbl
 
 (* Section switching *)
 
@@ -79,22 +77,18 @@ let rodata_space =
 let reg_tmp1 = phys_reg 21 (* used by the assembler *)
 let reg_tmp2 = phys_reg 22
 let reg_t2 = phys_reg 16
-(* let reg_fp = phys_reg 23 *)
 let reg_trap = phys_reg 24
 let reg_alloc_ptr = phys_reg 25
 let reg_alloc_lim = phys_reg 26
 
-(* Names of instructions that differ in 32 and 64-bit modes *)
-
-let lg = if rv64 then "ld" else "lw"
-let stg = if rv64 then "sd" else "sw"
-let datag = if rv64 then ".quad" else ".long"
-
 (* Output a pseudo-register *)
 
-let emit_reg = function
-  | {loc = Reg r} -> emit_string (register_name r)
-  | _ -> Misc.fatal_error "Emit.emit_reg"
+let reg_name = function
+  | {loc = Reg r} -> register_name r
+  | _ -> Misc.fatal_error "Emit.reg_name"
+
+let emit_reg r =
+  emit_string (reg_name r)
 
 (* Adjust sp by the given byte amount *)
 
@@ -106,43 +100,38 @@ let emit_stack_adjustment = function
       `	li	{emit_reg reg_tmp1}, {emit_int n}\n`;
       `	add	sp, sp, {emit_reg reg_tmp1}\n`
 
-let reload_ra n =
-  let ofs = n - size_addr in
+let emit_mem_op op src ofs =
   if is_immediate ofs then
-    `	{emit_string lg}	ra, {emit_int ofs}(sp)\n`
+    `	{emit_string op}	{emit_string src}, {emit_int ofs}(sp)\n`
   else begin
     `	li	{emit_reg reg_tmp1}, {emit_int ofs}\n`;
     `	add	{emit_reg reg_tmp1}, sp, {emit_reg reg_tmp1}\n`;
-    `	{emit_string lg}	ra, 0({emit_reg reg_tmp1})\n`
+    `	{emit_string op}	{emit_string src}, 0({emit_reg reg_tmp1})\n`
   end
+
+let emit_store src ofs =
+  emit_mem_op (if rv64 then "sd" else "sw") src ofs
+
+let emit_load dst ofs =
+  emit_mem_op (if rv64 then "ld" else "lw") dst ofs
+
+let reload_ra n =
+  emit_load "ra" (n - size_addr)
 
 let store_ra n =
-  let ofs = n - size_addr in
-  if is_immediate ofs then
-    `	{emit_string stg}	ra, {emit_int(n - size_addr)}(sp)\n`
-  else begin
-    `	li	{emit_reg reg_tmp1}, {emit_int ofs}\n`;
-    `	add	{emit_reg reg_tmp1}, sp, {emit_reg reg_tmp1}\n`;
-    `	{emit_string stg}	ra, 0({emit_reg reg_tmp1})\n`
-  end
+  emit_store "ra" (n - size_addr)
 
-let emit_store stg src ofs =
-  if is_immediate ofs then
-    `	{emit_string stg}	{emit_reg src}, {emit_int ofs}(sp)\n`
-  else begin
-    `	li	{emit_reg reg_tmp1}, {emit_int ofs}\n`;
-    `	add	{emit_reg reg_tmp1}, sp, {emit_reg reg_tmp1}\n`;
-    `	{emit_string stg}	{emit_reg src}, 0({emit_reg reg_tmp1})\n`
-  end
+let emit_store src ofs =
+  emit_store (reg_name src) ofs
 
-let emit_load lg dst ofs =
-  if is_immediate ofs then
-    `	{emit_string lg}	{emit_reg dst}, {emit_int ofs}(sp)\n`
-  else begin
-    `	li	{emit_reg reg_tmp1}, {emit_int ofs}\n`;
-    `	add	{emit_reg reg_tmp1}, sp, {emit_reg reg_tmp1}\n`;
-    `	{emit_string lg}	{emit_reg dst}, 0({emit_reg reg_tmp1})\n`
-  end
+let emit_load dst ofs =
+  emit_load (reg_name dst) ofs
+
+let emit_float_load dst ofs =
+  emit_mem_op "fld" (reg_name dst) ofs
+
+let emit_float_store src ofs =
+  emit_mem_op "fsd" (reg_name src) ofs
 
 (* Record live pointers at call points *)
 
@@ -290,16 +279,16 @@ let emit_instr i =
             `	fmv.d   {emit_reg dst}, {emit_reg src}\n`
         | {loc = Reg _; typ = (Val | Int | Addr)}, {loc = Stack s} ->
             let ofs = slot_offset s (register_class dst) in
-            emit_store stg src ofs
+            emit_store src ofs
         | {loc = Reg _; typ = Float}, {loc = Stack s} ->
             let ofs = slot_offset s (register_class dst) in
-            emit_store "fsd" src ofs
+            emit_float_store src ofs
         | {loc = Stack s; typ = (Val | Int | Addr)}, {loc = Reg _} ->
             let ofs = slot_offset s (register_class src) in
-            emit_load lg dst ofs
+            emit_load dst ofs
         | {loc = Stack s; typ = Float}, {loc = Reg _} ->
             let ofs = slot_offset s (register_class src) in
-            emit_load "fld" dst ofs
+            emit_float_load dst ofs
         | _ ->
             Misc.fatal_error "Emit: Imove"
       end
@@ -353,7 +342,7 @@ let emit_instr i =
         | Sixteen_signed -> "lh"
         | Thirtytwo_unsigned -> if rv64 then "lwu" else "lw"
         | Thirtytwo_signed -> "lw"
-        | Word_int | Word_val -> lg
+        | Word_int | Word_val -> if rv64 then "ld" else "lw"
         | Single -> assert false
         | Double | Double_u -> "fld"
       in
@@ -369,7 +358,7 @@ let emit_instr i =
         | Byte_unsigned | Byte_signed -> "sb"
         | Sixteen_unsigned | Sixteen_signed -> "sh"
         | Thirtytwo_unsigned | Thirtytwo_signed -> "sw"
-        | Word_int | Word_val -> stg
+        | Word_int | Word_val -> if rv64 then "sd" else "sw"
         | Single -> assert false
         | Double | Double_u -> "fsd"
       in
@@ -513,7 +502,7 @@ let emit_instr i =
       | None -> ()
       | Some lbl -> `	bgtz	{emit_reg reg_tmp1}, {emit_label lbl}\n`
       end
-  | Lswitch jumptbl -> (* FIXME FIXME ? *)
+  | Lswitch jumptbl ->
       let lbl = new_label() in
       `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
       `	slli	{emit_reg reg_tmp2}, {emit_reg i.arg.(0)}, 2\n`;
@@ -529,11 +518,11 @@ let emit_instr i =
       `	la	{emit_reg reg_tmp1}, {emit_label lbl_handler}\n`;
       `	addi	sp, sp, -16\n`;
       stack_offset := !stack_offset + 16;
-      `	{emit_string stg}	{emit_reg reg_tmp1}, {emit_int size_addr}(sp)\n`;
-      `	{emit_string stg}	{emit_reg reg_trap}, 0(sp)\n`;
+      emit_store reg_tmp1 size_addr;
+      emit_store reg_trap 0;
       `	mv	{emit_reg reg_trap}, sp\n`
   | Lpoptrap ->
-      `	{emit_string lg}	{emit_reg reg_trap}, 0(sp)\n`;
+      emit_load reg_trap 0;
       `	addi	sp, sp, 16\n`;
       stack_offset := !stack_offset - 16
   | Lraise k ->
@@ -544,8 +533,8 @@ let emit_instr i =
       | false, _
       | true, Cmm.Raise_notrace ->
           `	mv	sp, {emit_reg reg_trap}\n`;
-          `	{emit_string lg}	{emit_reg reg_tmp1}, {emit_int size_addr}(sp)\n`;
-          `	{emit_string lg}	{emit_reg reg_trap}, 0(sp)\n`;
+	  emit_load reg_tmp1 size_addr;
+	  emit_load reg_trap 0;
           `	addi	sp, sp, 16\n`;
           `	jalr	{emit_reg reg_tmp1}\n`
       end
@@ -591,6 +580,9 @@ let fundecl fundecl =
   end
 
 (* Emission of data *)
+
+let datag =
+  if rv64 then ".quad" else ".long"
 
 let declare_global_data s =
   `	.globl	{emit_symbol s}\n`;
