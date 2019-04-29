@@ -12,7 +12,6 @@
 
 (* Emission of RISC-V assembly code *)
 
-open Misc
 open Cmm
 open Arch
 open Proc
@@ -91,7 +90,7 @@ let datag = if rv64 then ".quad" else ".long"
 
 let emit_reg = function
   | {loc = Reg r} -> emit_string (register_name r)
-  | _ -> fatal_error "Emit.emit_reg"
+  | _ -> Misc.fatal_error "Emit.emit_reg"
 
 (* Adjust sp by the given byte amount *)
 
@@ -230,7 +229,7 @@ let name_for_intop = function
   | Ilsr  -> "srl"
   | Iasr  -> "sra"
   | Imod  -> "rem"
-  | _ -> fatal_error "Emit.Intop"
+  | _ -> Misc.fatal_error "Emit.Intop"
 
 let name_for_intop_imm = function
   | Iadd -> "addi"
@@ -240,19 +239,19 @@ let name_for_intop_imm = function
   | Ilsl -> "slli"
   | Ilsr -> "srli"
   | Iasr -> "srai"
-  | _ -> fatal_error "Emit.Intop_imm"
+  | _ -> Misc.fatal_error "Emit.Intop_imm"
 
 let name_for_floatop1 = function
   | Inegf -> "fneg.d"
   | Iabsf -> "fabs.d"
-  | _ -> fatal_error "Emit.Iopf1"
+  | _ -> Misc.fatal_error "Emit.Iopf1"
 
 let name_for_floatop2 = function
   | Iaddf -> "fadd.d"
   | Isubf -> "fsub.d"
   | Imulf -> "fmul.d"
   | Idivf -> "fdiv.d"
-  | _ -> fatal_error "Emit.Iopf2"
+  | _ -> Misc.fatal_error "Emit.Iopf2"
 
 let name_for_specific = function
   | Imultaddf false -> "fmadd.d"
@@ -298,7 +297,7 @@ let emit_instr i =
             let ofs = slot_offset s (register_class src) in
             emit_load "fld" dst ofs
         | _ ->
-            fatal_error "Emit: Imove"
+            Misc.fatal_error "Emit: Imove"
       end
   | Lop(Iconst_int n) ->
       `	li	{emit_reg i.res.(0)}, {emit_nativeint n}\n`
@@ -421,7 +420,7 @@ let emit_instr i =
   | Lop(Iintop_imm(Isub, n)) ->
       `	addi	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int(-n)}\n`
   | Lop(Iintop_imm(Icomp _, _)) ->
-      fatal_error "Emit.emit_instr (Iintop_imm (Icomp _, _))"
+      Misc.fatal_error "Emit.emit_instr (Iintop_imm (Icomp _, _))"
   | Lop(Iintop_imm(Icheckbound {label_after_error = label; _}, n)) ->
       let lbl = bound_error_label ?label i.dbg in
       `	li	{emit_reg reg_tmp1}, {emit_int n}\n`;
@@ -474,7 +473,7 @@ let emit_instr i =
           in
           `	{emit_string name}	{emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_label lbl}\n`
       | Iinttest_imm _ ->
-          fatal_error "Emit.emit_instr (Iinttest_imm _)"
+          Misc.fatal_error "Emit.emit_instr (Iinttest_imm _)"
       | Ifloattest cmp ->
           let branch =
             match cmp with
