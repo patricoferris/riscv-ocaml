@@ -14,21 +14,22 @@
 /* Asm part of the runtime system, RISC-V processor, 64-bit mode */
 /* Must be preprocessed by cpp */
 
-#define TRAP_PTR s1
-#define ALLOC_PTR s10
-#define ALLOC_LIMIT s11
-#define TMP0 t0
-#define TMP1 t1
-#define ARG t2
+#define TRAP_PTR	s1
+#define ALLOC_PTR	s10
+#define ALLOC_LIMIT	s11
+
+#define TMP	t0
+#define TMP2	t1
+#define ARG	t2
 
 #if defined(MODEL_riscv64)
-#define store sd
-#define load ld
-#define WSZ 8
+#define STORE	sd
+#define LOAD	ld
+#define WSZ	8
 #else
-#define store sw
-#define load lw
-#define WSZ 4
+#define STORE	sw
+#define LOAD	lw
+#define WSZ	4
 #endif
 
 #if defined(__PIC__)
@@ -50,41 +51,39 @@ caml_system__code_begin:
         .type   caml_call_gc, @function
 caml_call_gc:
         /* Record return address */
-        store   ra, caml_last_return_address, TMP0
+        STORE   ra, caml_last_return_address, TMP2
         /* Record lowest stack address */
-        mv      TMP1, sp
-        store   sp, caml_bottom_of_stack, TMP0
+        STORE   sp, caml_bottom_of_stack, TMP2
 .Lcaml_call_gc:
         /* Set up stack space, saving return address */
         /* (1 reg for RA, 1 reg for FP, 21 allocatable int regs, 20 caller-save float regs) * 8 */
         /* + 1 for alignment */
         addi    sp, sp, -0x160
-        mv      s0, sp
-        store   ra, 0x8(sp)
-        store   s0, 0x0(sp)
+        STORE   ra, 0x8(sp)
+        STORE   s0, 0x0(sp)
         /* Save allocatable integer registers on the stack,
            in the order given in proc.ml */
-        store   a0, 0x10(sp)
-        store   a1, 0x18(sp)
-        store   a2, 0x20(sp)
-        store   a3, 0x28(sp)
-        store   a4, 0x30(sp)
-        store   a5, 0x38(sp)
-        store   a6, 0x40(sp)
-        store   a7, 0x48(sp)
-        store   s2, 0x50(sp)
-        store   s3, 0x58(sp)
-        store   s4, 0x60(sp)
-        store   s5, 0x68(sp)
-        store   s6, 0x70(sp)
-        store   s7, 0x78(sp)
-        store   s8, 0x80(sp)
-        store   s9, 0x88(sp)
-        store   t2, 0x90(sp)
-        store   t3, 0x98(sp)
-        store   t4, 0xa0(sp)
-        store   t5, 0xa8(sp)
-        store   t6, 0xb0(sp)
+        STORE   a0, 0x10(sp)
+        STORE   a1, 0x18(sp)
+        STORE   a2, 0x20(sp)
+        STORE   a3, 0x28(sp)
+        STORE   a4, 0x30(sp)
+        STORE   a5, 0x38(sp)
+        STORE   a6, 0x40(sp)
+        STORE   a7, 0x48(sp)
+        STORE   s2, 0x50(sp)
+        STORE   s3, 0x58(sp)
+        STORE   s4, 0x60(sp)
+        STORE   s5, 0x68(sp)
+        STORE   s6, 0x70(sp)
+        STORE   s7, 0x78(sp)
+        STORE   s8, 0x80(sp)
+        STORE   s9, 0x88(sp)
+        STORE   t2, 0x90(sp)
+        STORE   t3, 0x98(sp)
+        STORE   t4, 0xa0(sp)
+        STORE   t5, 0xa8(sp)
+        STORE   t6, 0xb0(sp)
         /* Save caller-save floating-point registers on the stack
            (callee-saves are preserved by caml_garbage_collection) */
         fsd     ft0, 0xb8(sp)
@@ -109,36 +108,36 @@ caml_call_gc:
         fsd     ft10, 0x150(sp)
         fsd     ft11, 0x158(sp)
         /* Store pointer to saved integer registers in caml_gc_regs */
-        addi    TMP1, sp, 16
-        store   TMP1, caml_gc_regs, TMP0
+        addi    TMP, sp, 16
+        STORE   TMP, caml_gc_regs, TMP2
         /* Save current allocation pointer for debugging purposes */
-        store   ALLOC_PTR, caml_young_ptr, TMP0
+        STORE   ALLOC_PTR, caml_young_ptr, TMP2
         /* Save trap pointer in case an exception is raised during GC */
-        store   TRAP_PTR, caml_exception_pointer, TMP0
+        STORE   TRAP_PTR, caml_exception_pointer, TMP2
         /* Call the garbage collector */
         call    PLT(caml_garbage_collection)
         /* Restore registers */
-        load    a0, 0x10(sp)
-        load    a1, 0x18(sp)
-        load    a2, 0x20(sp)
-        load    a3, 0x28(sp)
-        load    a4, 0x30(sp)
-        load    a5, 0x38(sp)
-        load    a6, 0x40(sp)
-        load    a7, 0x48(sp)
-        load    s2, 0x50(sp)
-        load    s3, 0x58(sp)
-        load    s4, 0x60(sp)
-        load    s5, 0x68(sp)
-        load    s6, 0x70(sp)
-        load    s7, 0x78(sp)
-        load    s8, 0x80(sp)
-        load    s9, 0x88(sp)
-        load    t2, 0x90(sp)
-        load    t3, 0x98(sp)
-        load    t4, 0xa0(sp)
-        load    t5, 0xa8(sp)
-        load    t6, 0xb0(sp)
+        LOAD    a0, 0x10(sp)
+        LOAD    a1, 0x18(sp)
+        LOAD    a2, 0x20(sp)
+        LOAD    a3, 0x28(sp)
+        LOAD    a4, 0x30(sp)
+        LOAD    a5, 0x38(sp)
+        LOAD    a6, 0x40(sp)
+        LOAD    a7, 0x48(sp)
+        LOAD    s2, 0x50(sp)
+        LOAD    s3, 0x58(sp)
+        LOAD    s4, 0x60(sp)
+        LOAD    s5, 0x68(sp)
+        LOAD    s6, 0x70(sp)
+        LOAD    s7, 0x78(sp)
+        LOAD    s8, 0x80(sp)
+        LOAD    s9, 0x88(sp)
+        LOAD    t2, 0x90(sp)
+        LOAD    t3, 0x98(sp)
+        LOAD    t4, 0xa0(sp)
+        LOAD    t5, 0xa8(sp)
+        LOAD    t6, 0xb0(sp)
         fld     ft0, 0xb8(sp)
         fld     ft1, 0xc0(sp)
         fld     ft2, 0xc8(sp)
@@ -161,11 +160,11 @@ caml_call_gc:
         fld     ft10, 0x150(sp)
         fld     ft11, 0x158(sp)
         /* Reload new allocation pointer and allocation limit */
-        load    ALLOC_PTR, caml_young_ptr
-        load    ALLOC_LIMIT, caml_young_limit
+        LOAD    ALLOC_PTR, caml_young_ptr
+        LOAD    ALLOC_LIMIT, caml_young_limit
         /* Free stack space and return to caller */
-        load    ra, 0x8(sp)
-        load    s0, 0x0(sp)
+        LOAD    ra, 0x8(sp)
+        LOAD    s0, 0x0(sp)
         addi    sp, sp, 0x160
         ret
         .size   caml_call_gc, .-caml_call_gc
@@ -180,16 +179,16 @@ caml_c_call:
         /* Preserve return address in callee-save register s2 */
         mv      s2, ra
         /* Record lowest stack address and return address */
-        store   ra, caml_last_return_address, TMP0
-        store   sp, caml_bottom_of_stack, TMP0
+        STORE   ra, caml_last_return_address, TMP2
+        STORE   sp, caml_bottom_of_stack, TMP2
         /* Make the exception handler alloc ptr available to the C code */
-        store   ALLOC_PTR, caml_young_ptr, TMP0
-        store   TRAP_PTR, caml_exception_pointer, TMP0
+        STORE   ALLOC_PTR, caml_young_ptr, TMP2
+        STORE   TRAP_PTR, caml_exception_pointer, TMP2
         /* Call the function */
         jalr    ARG
         /* Reload alloc ptr and alloc limit */
-        load    ALLOC_PTR, caml_young_ptr
-        load    ALLOC_LIMIT, caml_young_limit
+        LOAD    ALLOC_PTR, caml_young_ptr
+        LOAD    ALLOC_LIMIT, caml_young_limit
         /* Return */
         jr      s2
         .size   caml_c_call, .-caml_c_call
@@ -200,15 +199,15 @@ caml_c_call:
         .type   caml_raise_exn, @function
 caml_raise_exn:
         /* Test if backtrace is active */
-        load    TMP1, caml_backtrace_active
-        bnez    TMP1, 2f
+        LOAD    TMP, caml_backtrace_active
+        bnez    TMP, 2f
 1:      /* Cut stack at current trap handler */
         mv      sp, TRAP_PTR
         /* Pop previous handler and jump to it */
-        load    TMP1, 8(sp)
-        load    TRAP_PTR, 0(sp)
+        LOAD    TMP, 8(sp)
+        LOAD    TRAP_PTR, 0(sp)
         addi    sp, sp, 16
-        jr      TMP1
+        jr      TMP
 2:      /* Preserve exception bucket in callee-save register s2 */
         mv      s2, a0
         /* Stash the backtrace */
@@ -230,21 +229,21 @@ caml_raise_exn:
         .globl  caml_raise_exception
         .type   caml_raise_exception, @function
 caml_raise_exception:
-        load    TRAP_PTR, caml_exception_pointer
-        load    ALLOC_PTR, caml_young_ptr
-        load    ALLOC_LIMIT, caml_young_limit
-        load    TMP1, caml_backtrace_active
-        bnez    TMP1, 2f
+        LOAD    TRAP_PTR, caml_exception_pointer
+        LOAD    ALLOC_PTR, caml_young_ptr
+        LOAD    ALLOC_LIMIT, caml_young_limit
+        LOAD    TMP, caml_backtrace_active
+        bnez    TMP, 2f
 1:      /* Cut stack at current trap handler */
         mv      sp, TRAP_PTR
-        load    TMP1, 8(sp)
-        load    TRAP_PTR, 0(sp)
+        LOAD    TMP, 8(sp)
+        LOAD    TRAP_PTR, 0(sp)
         addi    sp, sp, 16
-        jr      TMP1
+        jr      TMP
 2:      /* Preserve exception bucket in callee-save register s2 */
         mv      s2, a0
-        load    a1, caml_last_return_address
-        load    a2, caml_bottom_of_stack
+        LOAD    a1, caml_last_return_address
+        LOAD    a2, caml_bottom_of_stack
         mv      a3, TRAP_PTR
         call    PLT(caml_stash_backtrace)
         mv      a0, s2
@@ -265,19 +264,19 @@ caml_start_program:
 .Ljump_to_caml:
         /* Set up stack frame and save callee-save registers */
         addi    sp, sp, -0xd0
-        store   ra, 0xc0(sp)
-        store   s0, 0x0(sp)
-        store   s1, 0x8(sp)
-        store   s2, 0x10(sp)
-        store   s3, 0x18(sp)
-        store   s4, 0x20(sp)
-        store   s5, 0x28(sp)
-        store   s6, 0x30(sp)
-        store   s7, 0x38(sp)
-        store   s8, 0x40(sp)
-        store   s9, 0x48(sp)
-        store   s10, 0x50(sp)
-        store   s11, 0x58(sp)
+        STORE   ra, 0xc0(sp)
+        STORE   s0, 0x0(sp)
+        STORE   s1, 0x8(sp)
+        STORE   s2, 0x10(sp)
+        STORE   s3, 0x18(sp)
+        STORE   s4, 0x20(sp)
+        STORE   s5, 0x28(sp)
+        STORE   s6, 0x30(sp)
+        STORE   s7, 0x38(sp)
+        STORE   s8, 0x40(sp)
+        STORE   s9, 0x48(sp)
+        STORE   s10, 0x50(sp)
+        STORE   s11, 0x58(sp)
         fsd     fs0, 0x60(sp)
         fsd     fs1, 0x68(sp)
         fsd     fs2, 0x70(sp)
@@ -292,51 +291,51 @@ caml_start_program:
         fsd     fs11, 0xb8(sp)
         addi    sp, sp, -32
         /* Setup a callback link on the stack */
-        load    TMP1, caml_bottom_of_stack
-        store   TMP1, 0(sp)
-        load    TMP1, caml_last_return_address
-        store   TMP1, 8(sp)
-        load    TMP1, caml_gc_regs
-        store   TMP1, 16(sp)
+        LOAD    TMP, caml_bottom_of_stack
+        STORE   TMP, 0(sp)
+        LOAD    TMP, caml_last_return_address
+        STORE   TMP, 8(sp)
+        LOAD    TMP, caml_gc_regs
+        STORE   TMP, 16(sp)
         /* set up a trap frame */
         addi    sp, sp, -16
-        load    TMP1, caml_exception_pointer
-        store   TMP1, 0(sp)
-        lla     TMP0, .Ltrap_handler
-        store   TMP0, 8(sp)
+        LOAD    TMP, caml_exception_pointer
+        STORE   TMP, 0(sp)
+        lla     TMP, .Ltrap_handler
+        STORE   TMP, 8(sp)
         mv      TRAP_PTR, sp
-        load    ALLOC_PTR, caml_young_ptr
-        load    ALLOC_LIMIT, caml_young_limit
-        store   x0, caml_last_return_address, TMP0
+        LOAD    ALLOC_PTR, caml_young_ptr
+        LOAD    ALLOC_LIMIT, caml_young_limit
+        STORE   x0, caml_last_return_address, TMP2
         jalr    ARG
 .Lcaml_retaddr:         /* pop trap frame, restoring caml_exception_pointer */
-        load    TMP1, 0(sp)
-        store   TMP1, caml_exception_pointer, TMP0
+        LOAD    TMP, 0(sp)
+        STORE   TMP, caml_exception_pointer, TMP2
         addi    sp, sp, 16
 .Lreturn_result:        /* pop callback link, restoring global variables */
-        load    TMP1, 0(sp)
-        store   TMP1, caml_bottom_of_stack, TMP0
-        load    TMP1, 8(sp)
-        store   TMP1, caml_last_return_address, TMP0
-        load    TMP1, 16(sp)
-        store   TMP1, caml_gc_regs, TMP0
+        LOAD    TMP, 0(sp)
+        STORE   TMP, caml_bottom_of_stack, TMP2
+        LOAD    TMP, 8(sp)
+        STORE   TMP, caml_last_return_address, TMP2
+        LOAD    TMP, 16(sp)
+        STORE   TMP, caml_gc_regs, TMP2
         addi    sp, sp, 32
         /* Update allocation pointer */
-        store   ALLOC_PTR, caml_young_ptr, TMP0
+        STORE   ALLOC_PTR, caml_young_ptr, TMP2
         /* reload callee-save registers and return */
-        load    ra, 0xc0(sp)
-        load    s0, 0x0(sp)
-        load    s1, 0x8(sp)
-        load    s2, 0x10(sp)
-        load    s3, 0x18(sp)
-        load    s4, 0x20(sp)
-        load    s5, 0x28(sp)
-        load    s6, 0x30(sp)
-        load    s7, 0x38(sp)
-        load    s8, 0x40(sp)
-        load    s9, 0x48(sp)
-        load    s10, 0x50(sp)
-        load    s11, 0x58(sp)
+        LOAD    ra, 0xc0(sp)
+        LOAD    s0, 0x0(sp)
+        LOAD    s1, 0x8(sp)
+        LOAD    s2, 0x10(sp)
+        LOAD    s3, 0x18(sp)
+        LOAD    s4, 0x20(sp)
+        LOAD    s5, 0x28(sp)
+        LOAD    s6, 0x30(sp)
+        LOAD    s7, 0x38(sp)
+        LOAD    s8, 0x40(sp)
+        LOAD    s9, 0x48(sp)
+        LOAD    s10, 0x50(sp)
+        LOAD    s11, 0x58(sp)
         fld     fs0, 0x60(sp)
         fld     fs1, 0x68(sp)
         fld     fs2, 0x70(sp)
@@ -352,7 +351,7 @@ caml_start_program:
         addi    sp, sp, 0xd0
         ret
 .Ltrap_handler:
-        store   TRAP_PTR, caml_exception_pointer, TMP0
+        STORE   TRAP_PTR, caml_exception_pointer, TMP2
         ori     a0, a0, 2
         j       .Lreturn_result
         .size   caml_start_program, .-caml_start_program
@@ -364,10 +363,10 @@ caml_start_program:
         .type   caml_callback_exn, @function
 caml_callback_exn:
         /* Initial shuffling of arguments (a0 = closure, a1 = first arg) */
-        mv      TMP1, a0
+        mv      TMP, a0
         mv      a0, a1          /* a0 = first arg */
-        mv      a1, TMP1        /* a1 = closure environment */
-        load    ARG, 0(TMP1)    /* code pointer */
+        mv      a1, TMP        /* a1 = closure environment */
+        LOAD    ARG, 0(TMP)    /* code pointer */
         j       .Ljump_to_caml
         .size   caml_callback_exn, .-caml_callback_exn
 
@@ -376,10 +375,10 @@ caml_callback_exn:
         .type   caml_callback2_exn, @function
 caml_callback2_exn:
         /* Initial shuffling of arguments (a0 = closure, a1 = arg1, a2 = arg2) */
-        mv      TMP1, a0
+        mv      TMP, a0
         mv      a0, a1
         mv      a1, a2
-        mv      a2, TMP1
+        mv      a2, TMP
         la      ARG, caml_apply2
         j       .Ljump_to_caml
         .size   caml_callback2_exn, .-caml_callback2_exn
@@ -390,11 +389,11 @@ caml_callback2_exn:
 caml_callback3_exn:
         /* Initial shuffling of argumnets */
         /* (a0 = closure, a1 = arg1, a2 = arg2, a3 = arg3) */
-        mv      TMP1, a0
+        mv      TMP, a0
         mv      a0, a1
         mv      a1, a2
         mv      a2, a3
-        mv      a3, TMP1
+        mv      a3, TMP
         la      ARG, caml_apply3
         j       .Ljump_to_caml
         .size   caml_callback3_exn, .-caml_callback3_exn
