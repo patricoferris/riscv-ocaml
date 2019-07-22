@@ -60,6 +60,7 @@ native_compiler=true
 TOOLPREF=""
 with_cfi=true
 flambda=false
+lto=false
 force_safe_string=false
 default_safe_string=true
 afl_instrument=false
@@ -211,6 +212,8 @@ while : ; do
         native_compiler=false;;
     -flambda|--flambda)
         flambda=true;;
+    -lto|--lto)
+        lto=true;;
     -with-flambda-invariants|--with-flambda-invariants)
         with_flambda_invariants=true;;
     -with-cplugins|--with-cplugins)
@@ -474,7 +477,7 @@ case "$ccfamily" in
 -fno-builtin-memcmp";
     internal_cflags="$gcc_warnings";;
   gcc-*)
-    common_cflags="-O2 -fno-strict-aliasing -fwrapv";
+    common_cflags="-Os -fno-strict-aliasing -fwrapv";
     internal_cflags="$gcc_warnings";;
   *)
     common_cflags="-O";;
@@ -591,8 +594,8 @@ case $? in
   0) inf "The C compiler is ISO C99 compliant." ;;
   1) wrn "The C compiler is ANSI / ISO C90 compliant, but not ISO C99" \
          "compliant.";;
-  2) err "The C compiler $cc is not ISO C compliant.\n" \
-         "You need an ISO C99 compiler to build OCaml.";;
+  #2) err "The C compiler $cc is not ISO C compliant.\n" \
+  #       "You need an ISO C99 compiler to build OCaml.";;
   *)
      if $cross_compiler; then
        wrn "Unable to compile the test program.\n" \
@@ -716,11 +719,13 @@ case $? in
      echo "#define ARCH_BIG_ENDIAN" >> m.h;;
   1) inf "This is a little-endian architecture."
      echo "#undef ARCH_BIG_ENDIAN" >> m.h;;
-  2) err "This architecture seems to be neither big endian nor little" \
-         "endian.\n OCaml won't run on this architecture.";;
+  #2) err "This architecture seems to be neither big endian nor little" \
+  #       "endian.\n OCaml won't run on this architecture.";;
   *) case $target in
        *-*-mingw*) inf "This is a little-endian architecture."
                    echo "#undef ARCH_BIG_ENDIAN" >> m.h;;
+       riscv64-*-linux*) inf "This is a little-endian architecture."
+                   echo "#undef ARCH_BIG_ENDIAN" >> m.h;;                   
        *) wrn "Something went wrong during endianness determination.\n" \
               "You will have to figure out endianness yourself\n" \
               "(option ARCH_BIG_ENDIAN in m.h).";;
@@ -2150,6 +2155,7 @@ config WINDOWS_UNICODE "0"
 config AFL_INSTRUMENT "$afl_instrument"
 config MAX_TESTSUITE_DIR_RETRIES "$max_testsuite_dir_retries"
 config FLAT_FLOAT_ARRAY "$flat_float_array"
+config LTO "$lto"
 config AWK "awk"
 
 

@@ -198,7 +198,7 @@ caml_c_call:
         .type   caml_raise_exn, @function
 caml_raise_exn:
         /* Test if backtrace is active */
-        load    TMP1, caml_backtrace_active
+        lw    TMP1, caml_backtrace_active
         bnez    TMP1, 2f
 1:      /* Cut stack at current trap handler */
         mv      sp, TRAP_PTR
@@ -231,7 +231,7 @@ caml_raise_exception:
         load    TRAP_PTR, caml_exception_pointer
         load    ALLOC_PTR, caml_young_ptr
         load    ALLOC_LIMIT, caml_young_limit
-        load    TMP1, caml_backtrace_active
+        lw    TMP1, caml_backtrace_active
         bnez    TMP1, 2f
 1:      /* Cut stack at current trap handler */
         mv      sp, TRAP_PTR
