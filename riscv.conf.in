@@ -1,0 +1,8 @@
+path(riscv) = "%{prefix}%/riscv-sysroot/lib"
+destdir(riscv) = "%{prefix}%/riscv-sysroot/lib"
+stdlib(riscv) = "%{prefix}%/riscv-sysroot/lib/ocaml"
+ocamlopt(riscv) = "%{prefix}%/riscv-sysroot/bin/ocamlopt"
+ocamlc(riscv) = "%{prefix}%/riscv-sysroot/bin/ocamlc"
+ocamlmklib(riscv) = "%{prefix}%/riscv-sysroot/bin/ocamlmklib"
+ocamldep(riscv) = "%{prefix}%/riscv-sysroot/bin/ocamldep"
+ocamlcp(riscv) = "%{prefix}%/riscv-sysroot/bin/ocamlcp"
