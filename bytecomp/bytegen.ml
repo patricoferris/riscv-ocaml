@@ -759,6 +759,7 @@ let rec comp_expr env exp sz cont =
       let l = comp_expr env body (sz+4) body_cont in
       try_blocks := List.tl !try_blocks;
       Kpushtrap lbl_handler :: l
+  | Lcamel arg -> comp_expr env arg sz (Koffsetint (2) :: cont)
   | Lifthenelse(cond, ifso, ifnot) ->
       comp_binary_test env cond ifso ifnot sz cont
   | Lsequence(exp1, exp2) ->

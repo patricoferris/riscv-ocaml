@@ -405,6 +405,8 @@ and transl_exp0 e =
       with Not_constant ->
         Lprim(Pmakearray (kind, Mutable), ll, e.exp_loc)
       end
+  | Texp_camel expr ->
+      Lcamel(transl_exp expr)
   | Texp_ifthenelse(cond, ifso, Some ifnot) ->
       Lifthenelse(transl_exp cond,
                   event_before ifso (transl_exp ifso),

@@ -308,6 +308,9 @@ and expression i ppf x =
   | Pexp_array (l) ->
       line i ppf "Pexp_array\n";
       list i expression ppf l;
+  | Pexp_camel (e1) ->
+      line i ppf "Pexp_camel\n";
+      expression i ppf e1;
   | Pexp_ifthenelse (e1, e2, eo) ->
       line i ppf "Pexp_ifthenelse\n";
       expression i ppf e1;

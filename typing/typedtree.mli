@@ -209,6 +209,7 @@ and expression_desc =
   | Texp_setfield of
       expression * Longident.t loc * label_description * expression
   | Texp_array of expression list
+  | Texp_camel of expression
   | Texp_ifthenelse of expression * expression * expression option
   | Texp_sequence of expression * expression
   | Texp_while of expression * expression

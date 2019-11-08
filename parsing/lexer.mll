@@ -42,6 +42,7 @@ let keyword_table =
     "as", AS;
     "assert", ASSERT;
     "begin", BEGIN;
+    "camel", CAMEL;
     "class", CLASS;
     "constraint", CONSTRAINT;
     "do", DO;

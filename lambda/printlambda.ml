@@ -596,6 +596,8 @@ let rec lam ppf = function
   | Ltrywith(lbody, param, lhandler) ->
       fprintf ppf "@[<2>(try@ %a@;<1 -1>with %a@ %a)@]"
         lam lbody Ident.print param lam lhandler
+  | Lcamel e ->
+      fprintf ppf "@[<2>(camel@ %a@)@]" lam e
   | Lifthenelse(lcond, lif, lelse) ->
       fprintf ppf "@[<2>(if@ %a@ %a@ %a)@]" lam lcond lam lif lam lelse
   | Lsequence(l1, l2) ->

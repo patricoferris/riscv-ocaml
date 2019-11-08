@@ -291,6 +291,7 @@ let expr sub x =
         )
     | Texp_array list ->
         Texp_array (List.map (sub.expr sub) list)
+    | Texp_camel exp1 -> Texp_camel (sub.expr sub exp1)
     | Texp_ifthenelse (exp1, exp2, expo) ->
         Texp_ifthenelse (
           sub.expr sub exp1,

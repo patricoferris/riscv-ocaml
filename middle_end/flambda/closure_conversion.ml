@@ -527,6 +527,10 @@ let rec close t env (lam : Lambda.lambda) : Flambda.t =
   | Ltrywith (body, id, handler) ->
     let var = Variable.create_with_same_name_as_ident id in
     Try_with (close t env body, var, close t (Env.add_var env id var) handler)
+  | Lcamel arg ->
+    let var = Variable.create Names.cameln in 
+    let lam = close t env arg in
+    Flambda.create_let var (Expr lam) (lam)
   | Lifthenelse (cond, ifso, ifnot) ->
     let cond = close t env cond in
     let cond_var = Variable.create Names.cond in

@@ -66,6 +66,7 @@ and ulambda =
       ulambda *
       ulambda
   | Utrywith of ulambda * Backend_var.With_provenance.t * ulambda
+  | Ucamel of ulambda
   | Uifthenelse of ulambda * ulambda * ulambda
   | Usequence of ulambda * ulambda
   | Uwhile of ulambda * ulambda

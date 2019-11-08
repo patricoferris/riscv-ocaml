@@ -21,6 +21,7 @@ val apply_funct : t
 val block_symbol : t
 val block_symbol_get : t
 val block_symbol_get_field : t
+val cameln : t
 val closure : t
 val cond : t
 val cond_sequor : t

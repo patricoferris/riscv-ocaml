@@ -213,6 +213,8 @@ and lam ppf = function
   | Utrywith(lbody, param, lhandler) ->
       fprintf ppf "@[<2>(try@ %a@;<1 -1>with %a@ %a)@]"
         lam lbody VP.print param lam lhandler
+  | Ucamel ln -> 
+      fprintf ppf "@[<2>(camel@ %a)@]" lam ln
   | Uifthenelse(lcond, lif, lelse) ->
       fprintf ppf "@[<2>(if@ %a@ %a@ %a)@]" lam lcond lam lif lam lelse
   | Usequence(l1, l2) ->

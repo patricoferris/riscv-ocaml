@@ -165,6 +165,7 @@ let make_var_info (clam : Clambda.ulambda) : var_info =
       loop body;
       ignore_var_with_provenance var;
       loop handler
+    | Ucamel arg -> loop arg
     | Uifthenelse (cond, ifso, ifnot) ->
       loop cond;
       loop ifso;
@@ -374,6 +375,9 @@ let let_bound_vars_that_can_be_moved var_info (clam : Clambda.ulambda) =
       ignore_var_with_provenance var;
       loop handler;
       let_stack := []
+    | Ucamel arg -> 
+      loop arg;
+      let_stack := []
     | Uifthenelse (cond, ifso, ifnot) ->
       examine_argument_list [cond];
       let_stack := [];
@@ -530,6 +534,9 @@ let rec substitute_let_moveable is_let_moveable env (clam : Clambda.ulambda)
     let body = substitute_let_moveable is_let_moveable env body in
     let handler = substitute_let_moveable is_let_moveable env handler in
     Utrywith (body, var, handler)
+  | Ucamel arg -> 
+    let arg = substitute_let_moveable is_let_moveable env arg in 
+    Ucamel arg
   | Uifthenelse (cond, ifso, ifnot) ->
     let cond = substitute_let_moveable is_let_moveable env cond in
     let ifso = substitute_let_moveable is_let_moveable env ifso in
@@ -748,6 +755,9 @@ let rec un_anf_and_moveable var_info env (clam : Clambda.ulambda)
     let body = un_anf var_info env body in
     let handler = un_anf var_info env handler in
     Utrywith (body, var, handler), Fixed
+  | Ucamel arg ->
+    let arg = un_anf var_info env arg in 
+    Ucamel (arg), Fixed
   | Uifthenelse (cond, ifso, ifnot) ->
     let cond, cond_moveable = un_anf_and_moveable var_info env cond in
     let ifso, ifso_moveable = un_anf_and_moveable var_info env ifso in

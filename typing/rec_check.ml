@@ -196,6 +196,7 @@ let classify_expression : Typedtree.expression -> sd =
         Static
 
     | Texp_match _
+    | Texp_camel _
     | Texp_ifthenelse _
     | Texp_send _
     | Texp_field _
@@ -638,6 +639,8 @@ let rec expression : Typedtree.expression -> term_judg =
           array field es << field_mode;
           option expression eo << Dereference
         ]
+    | Texp_camel (exp1) ->
+        expression exp1 << Dereference
     | Texp_ifthenelse (cond, ifso, ifnot) ->
       (*
         Gc |- c: m[Dereference]

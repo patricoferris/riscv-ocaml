@@ -215,6 +215,7 @@ let expr sub {exp_extra; exp_desc; exp_env; _} =
       sub.expr sub exp1;
       sub.expr sub exp2
   | Texp_array list -> List.iter (sub.expr sub) list
+  | Texp_camel exp1 -> sub.expr sub exp1
   | Texp_ifthenelse (exp1, exp2, expo) ->
       sub.expr sub exp1;
       sub.expr sub exp2;

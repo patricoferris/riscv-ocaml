@@ -2256,6 +2256,9 @@ let rec transl env e =
   | Utrywith(body, exn, handler) ->
       let dbg = Debuginfo.none in
       Ctrywith(transl env body, exn, transl env handler, dbg)
+  | Ucamel arg -> 
+      let dbg = Debuginfo.none in 
+      Cop(Caddi, [transl env arg; Cconst_int (2, dbg)], dbg)
   | Uifthenelse(cond, ifso, ifnot) ->
       let ifso_dbg = Debuginfo.none in
       let ifnot_dbg = Debuginfo.none in

@@ -562,6 +562,7 @@ let mk_directive ~loc name arg =
 %token BARBAR
 %token BARRBRACKET
 %token BEGIN
+%token CAMEL
 %token <char> CHAR
 %token CLASS
 %token COLON
@@ -734,7 +735,7 @@ The precedences must be listed from low to high.
 %nonassoc below_DOT
 %nonassoc DOT DOTOP
 /* Finally, the first tokens of simple_expr are above everything else. */
-%nonassoc BACKQUOTE BANG BEGIN CHAR FALSE FLOAT INT
+%nonassoc BACKQUOTE BANG BEGIN CAMEL CHAR FALSE FLOAT INT
           LBRACE LBRACELESS LBRACKET LBRACKETBAR LIDENT LPAREN
           NEW PREFIXOP STRING TRUE UIDENT
           LBRACKETPERCENT
@@ -2127,6 +2128,8 @@ expr:
       { Pexp_try($3, $5), $2 }
   | TRY ext_attributes seq_expr WITH error
       { syntax_error() }
+  | CAMEL ext_attributes expr 
+      { Pexp_camel($3), $2 }
   | IF ext_attributes seq_expr THEN expr ELSE expr
       { Pexp_ifthenelse($3, $5, Some $7), $2 }
   | IF ext_attributes seq_expr THEN expr
@@ -3361,6 +3364,7 @@ operator:
   | DOTOP LBRACE RBRACE LESSMINUS               { "."^ $1 ^ "{}<-" }
   | HASHOP                                      { $1 }
   | BANG                                        { "!" }
+  | CAMEL                                       { "camel" }
   | infix_operator                              { $1 }
 ;
 %inline infix_operator:
@@ -3566,6 +3570,7 @@ single_attr_id:
   | AS { "as" }
   | ASSERT { "assert" }
   | BEGIN { "begin" }
+  | CAMEL { "camel" }
   | CLASS { "class" }
   | CONSTRAINT { "constraint" }
   | DO { "do" }

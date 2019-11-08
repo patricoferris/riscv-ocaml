@@ -28,6 +28,7 @@ type type_forcing_context =
   | If_no_else_branch
   | While_loop_conditional
   | While_loop_body
+  | Camel_argument
   | For_loop_start_index
   | For_loop_stop_index
   | For_loop_body
@@ -214,6 +215,7 @@ let iter_expression f e =
     | Pexp_while (e1, e2)
     | Pexp_sequence (e1, e2)
     | Pexp_setfield (e1, _, e2) -> expr e1; expr e2
+    | Pexp_camel e -> expr e
     | Pexp_ifthenelse (e1, e2, eo) -> expr e1; expr e2; may expr eo
     | Pexp_for (_, e1, e2, _, e3) -> expr e1; expr e2; expr e3
     | Pexp_override sel -> List.iter (fun (_, e) -> expr e) sel
@@ -1826,6 +1828,7 @@ let rec is_nonexpansive exp =
         fields
       && is_nonexpansive_opt extended_expression
   | Texp_field(exp, _, _) -> is_nonexpansive exp
+  | Texp_camel exp -> is_nonexpansive exp
   | Texp_ifthenelse(_cond, ifso, ifnot) ->
       is_nonexpansive ifso && is_nonexpansive_opt ifnot
   | Texp_sequence (_e1, e2) -> is_nonexpansive e2  (* PR#4354 *)
@@ -2073,7 +2076,7 @@ let check_partial_application statement exp =
             | Texp_while _ | Texp_for _ | Texp_instvar _
             | Texp_setinstvar _ | Texp_override _ | Texp_assert _
             | Texp_lazy _ | Texp_object _ | Texp_pack _ | Texp_unreachable
-            | Texp_extension_constructor _ | Texp_ifthenelse (_, _, None)
+            | Texp_extension_constructor _ | Texp_ifthenelse (_, _, None) | Texp_camel _
             | Texp_function _ ->
                 check_statement ()
             | Texp_match (_, cases, _) ->
@@ -2758,6 +2761,15 @@ and type_expect_
         exp_desc = Texp_array argl;
         exp_loc = loc; exp_extra = [];
         exp_type = instance ty_expected;
+        exp_attributes = sexp.pexp_attributes;
+        exp_env = env }
+  | Pexp_camel (expr) ->
+      let cond = type_expect env expr 
+          (mk_expected ~explanation:Camel_argument Predef.type_int) in 
+      re {
+        exp_desc = Texp_camel(cond);
+        exp_loc = loc; exp_extra = [];
+        exp_type = Predef.type_int;
         exp_attributes = sexp.pexp_attributes;
         exp_env = env }
   | Pexp_ifthenelse(scond, sifso, sifnot) ->
@@ -4916,6 +4928,8 @@ let report_type_expected_explanation expl ppf =
       because "the condition of a while-loop"
   | While_loop_body ->
       because "the body of a while-loop"
+  | Camel_argument ->
+      because "the body of the camel"
   | For_loop_start_index ->
       because "a for-loop start index"
   | For_loop_stop_index ->

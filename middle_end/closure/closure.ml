@@ -90,6 +90,7 @@ let occurs_var var u =
     | Ustaticfail (_, args) -> List.exists occurs args
     | Ucatch(_, _, body, hdlr) -> occurs body || occurs hdlr
     | Utrywith(body, _exn, hdlr) -> occurs body || occurs hdlr
+    | Ucamel arg -> occurs arg 
     | Uifthenelse(cond, ifso, ifnot) ->
         occurs cond || occurs ifso || occurs ifnot
     | Usequence(u1, u2) -> occurs u1 || occurs u2
@@ -190,6 +191,7 @@ let lambda_smaller lam threshold =
         incr size; lambda_size body; lambda_size handler
     | Utrywith(body, _id, handler) ->
         size := !size + 8; lambda_size body; lambda_size handler
+    | Ucamel arg -> lambda_size arg
     | Uifthenelse(cond, ifso, ifnot) ->
         size := !size + 2;
         lambda_size cond; lambda_size ifso; lambda_size ifnot
@@ -661,6 +663,7 @@ let rec substitute loc ((backend, fpc) as st) sb rn ulam =
       Utrywith(substitute loc st sb rn u1, id',
                substitute loc st
                  (V.Map.add (VP.var id) (Uvar (VP.var id')) sb) rn u2)
+  | Ucamel arg -> Ucamel(substitute loc st sb rn arg)
   | Uifthenelse(u1, u2, u3) ->
       begin match substitute loc st sb rn u1 with
         Uconst (Uconst_ptr n) ->
@@ -1132,6 +1135,9 @@ let rec close ({ backend; fenv; cenv } as env) lam =
       let (ubody, _) = close env body in
       let (uhandler, _) = close env handler in
       (Utrywith(ubody, VP.create id, uhandler), Value_unknown)
+  | Lcamel arg -> 
+      let (ulam, _) = close env arg in 
+      (Ucamel(ulam), Value_unknown)
   | Lifthenelse(arg, ifso, ifnot) ->
       begin match close env arg with
         (uarg, Value_const (Uconst_ptr n)) ->
@@ -1439,6 +1445,7 @@ let collect_exported_structured_constants a =
     | Utrywith (u1, _, u2)
     | Usequence (u1, u2)
     | Uwhile (u1, u2)  -> ulam u1; ulam u2
+    | Ucamel u1 -> ulam u1
     | Uifthenelse (u1, u2, u3)
     | Ufor (_, u1, u2, _, u3) -> ulam u1; ulam u2; ulam u3
     | Uassign (_, u) -> ulam u

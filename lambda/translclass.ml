@@ -650,7 +650,7 @@ let free_methods l =
         fv := Ident.Set.remove exn !fv
     | Lfor(v, _e1, _e2, _dir, _e3) ->
         fv := Ident.Set.remove v !fv
-    | Lassign _
+    | Lassign _ | Lcamel _
     | Lvar _ | Lconst _ | Lapply _
     | Lprim _ | Lswitch _ | Lstringswitch _ | Lstaticraise _
     | Lifthenelse _ | Lsequence _ | Lwhile _

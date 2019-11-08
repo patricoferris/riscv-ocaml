@@ -453,6 +453,7 @@ let expression sub exp =
           sub.expr sub exp2)
     | Texp_array list ->
         Pexp_array (List.map (sub.expr sub) list)
+    | Texp_camel exp1 -> Pexp_camel (sub.expr sub exp1)
     | Texp_ifthenelse (exp1, exp2, expo) ->
         Pexp_ifthenelse (sub.expr sub exp1,
           sub.expr sub exp2,

@@ -285,6 +285,7 @@ type lambda =
   | Lstaticraise of int * lambda list
   | Lstaticcatch of lambda * (int * (Ident.t * value_kind) list) * lambda
   | Ltrywith of lambda * Ident.t * lambda
+  | Lcamel of lambda 
   | Lifthenelse of lambda * lambda * lambda
   | Lsequence of lambda * lambda
   | Lwhile of lambda * lambda
@@ -408,6 +409,8 @@ let make_key e =
         Lstaticcatch (tr_rec env e1,xs,tr_rec env e2)
     | Ltrywith (e1,x,e2) ->
         Ltrywith (tr_rec env e1,x,tr_rec env e2)
+    | Lcamel e ->
+        Lcamel (tr_rec env e)
     | Lifthenelse (cond,ifso,ifnot) ->
         Lifthenelse (tr_rec env cond,tr_rec env ifso,tr_rec env ifnot)
     | Lsequence (e1,e2) ->
@@ -499,6 +502,8 @@ let shallow_iter ~tail ~non_tail:f = function
       tail e1; tail e2
   | Ltrywith(e1, _, e2) ->
       f e1; tail e2
+  | Lcamel e -> 
+      f e
   | Lifthenelse(e1, e2, e3) ->
       f e1; tail e2; tail e3
   | Lsequence(e1, e2) ->
@@ -570,6 +575,7 @@ let rec free_variables = function
            param
            (free_variables handler))
         (free_variables body)
+  | Lcamel e -> free_variables e
   | Lifthenelse(e1, e2, e3) ->
       Ident.Set.union
         (Ident.Set.union (free_variables e1) (free_variables e2))
@@ -717,6 +723,7 @@ let subst update_env s lam =
                     subst (remove_list params s) handler)
     | Ltrywith(body, exn, handler) ->
         Ltrywith(subst s body, exn, subst (Ident.Map.remove exn s) handler)
+    | Lcamel e -> Lcamel (subst s e)
     | Lifthenelse(e1, e2, e3) -> Lifthenelse(subst s e1, subst s e2, subst s e3)
     | Lsequence(e1, e2) -> Lsequence(subst s e1, subst s e2)
     | Lwhile(e1, e2) -> Lwhile(subst s e1, subst s e2)
@@ -798,6 +805,8 @@ let shallow_map f = function
       Lstaticcatch (f body, id, f handler)
   | Ltrywith (e1, v, e2) ->
       Ltrywith (f e1, v, f e2)
+  | Lcamel e -> 
+      Lcamel (f e)
   | Lifthenelse (e1, e2, e3) ->
       Lifthenelse (f e1, f e2, f e3)
   | Lsequence (e1, e2) ->

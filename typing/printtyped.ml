@@ -355,6 +355,9 @@ and expression i ppf x =
   | Texp_array (l) ->
       line i ppf "Texp_array\n";
       list i expression ppf l;
+  | Texp_camel (e1) ->
+      line i ppf "Texp_camel\n";
+      expression i ppf e1;
   | Texp_ifthenelse (e1, e2, eo) ->
       line i ppf "Texp_ifthenelse\n";
       expression i ppf e1;

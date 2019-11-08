@@ -319,6 +319,8 @@ and expression_desc =
         (* E1.l <- E2 *)
   | Pexp_array of expression list
         (* [| E1; ...; En |] *)
+  | Pexp_camel of expression 
+        (* camel E1 *)
   | Pexp_ifthenelse of expression * expression * expression option
         (* if E1 then E2 else E3 *)
   | Pexp_sequence of expression * expression
