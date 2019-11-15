@@ -401,7 +401,7 @@ FUNCTION(caml_ml_array_bound_error)
         /* Load address of [caml_array_bound_error] in ARG */
         la      ARG, caml_array_bound_error
         /* Call that function */
-        j       caml_c_call
+        tail    caml_c_call
         .size   caml_ml_array_bound_error, .-caml_ml_array_bound_error
 
         .globl  caml_system__code_end
