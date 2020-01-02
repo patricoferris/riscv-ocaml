@@ -124,8 +124,8 @@ let rec expr ppf = function
     fprintf ppf "block-hdr(%s)%s"
       (Nativeint.to_string n) (Debuginfo.to_string d)
   | Cconst_float n -> fprintf ppf "%F" n
-  | Cconst_symbol s -> fprintf ppf "\"%s\"" s
-  | Cconst_pointer n -> fprintf ppf "%ia" n
+  | Cconst_symbol s -> fprintf ppf "symbol \"%s\"" s
+  | Cconst_pointer n -> fprintf ppf "pointy%ia" n
   | Cconst_natpointer n -> fprintf ppf "%sa" (Nativeint.to_string n)
   | Cvar id -> Ident.print ppf id
   | Clet(id, def, (Clet(_, _, _) as body)) ->
@@ -224,7 +224,7 @@ let fundecl ppf f =
          print_cases f.fun_args sequence f.fun_body
 
 let data_item ppf = function
-  | Cdefine_symbol s -> fprintf ppf "\"%s\":" s
+  | Cdefine_symbol s -> fprintf ppf "def \"%s\":" s
   | Cglobal_symbol s -> fprintf ppf "global \"%s\"" s
   | Cint8 n -> fprintf ppf "byte %i" n
   | Cint16 n -> fprintf ppf "int16 %i" n

@@ -251,6 +251,7 @@ let name_for_specific = function
   | Imultaddf true  -> "fnmadd.d"
   | Imultsubf false -> "fmsub.d"
   | Imultsubf true  -> "fnmsub.d"
+  | Icamlisint      -> "caml_is_int"
 
 (* Name of current function *)
 let function_name = ref ""
@@ -428,8 +429,14 @@ let emit_instr i =
       let name = if rv64 then "fcvt.l.d" else "fcvt.w.d" in
       `	{emit_string name}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}\n`
   | Lop(Ispecific sop) ->
-      let instr = name_for_specific sop in
-      `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
+      begin match sop with 
+        | Icamlisint -> 
+          let instr = name_for_specific sop in
+          ` {emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(0)}\n`
+        | _ -> 
+          let instr = name_for_specific sop in
+          `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
+      end
   | Lop (Iname_for_debugger _) ->
       ()
   | Lreloadretaddr ->

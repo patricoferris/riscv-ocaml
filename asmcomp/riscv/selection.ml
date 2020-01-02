@@ -67,6 +67,41 @@ method! select_condition = function
   | arg ->
       (Itruetest, arg)
 
+(* Emitting Custom Instructions *)
+method! emit_expr (env:Selectgen.environment) exp = 
+  match exp with 
+  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
+    if (ifso = 1) && (ifnot = 3) then (
+      let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
+      begin match self#emit_expr env earg with
+          None -> None
+        | Some rarg ->
+            let _ = self#emit_tuple env ([Ctuple ([Cconst_pointer ifso; Cconst_pointer ifnot])]) in
+            let rd = self#regs_for typ_int in
+            let op = (Ispecific (Icamlisint)) in 
+            print_endline "===CIFTHENELSE===";
+            Some (super#insert_op_debug op debug rarg rd)
+        end
+    ) else (
+      super#emit_expr env exp
+    )
+  | _ -> super#emit_expr env exp
+
+method private emit_tuple_not_flattened env exp_list =
+  let rec emit_list = function
+    [] -> []
+  | exp :: rem ->
+      (* Again, force right-to-left evaluation *)
+      let loc_rem = emit_list rem in
+      match self#emit_expr env exp with
+        None -> assert false  (* should have been caught in emit_parts *)
+      | Some loc_exp -> loc_exp :: loc_rem
+  in
+  emit_list exp_list
+
+method private emit_tuple env exp_list =
+  Array.concat (self#emit_tuple_not_flattened env exp_list)
+
 end
 
 let fundecl f = (new selector)#emit_fundecl f
