@@ -71,6 +71,7 @@ method! select_condition = function
 method! emit_expr (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
+    print_endline ("CIF CIF CIF " ^ string_of_int ifso ^ string_of_int ifnot);
     if (ifso = 1) && (ifnot = 3) then (
       let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
       begin match self#emit_expr env earg with
