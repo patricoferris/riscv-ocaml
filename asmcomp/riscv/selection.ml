@@ -68,6 +68,7 @@ method! select_condition = function
       (Itruetest, arg)
 
 (* Emitting Custom Instructions *)
+
 method! emit_expr (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
@@ -77,10 +78,9 @@ method! emit_expr (env:Selectgen.environment) exp =
       begin match self#emit_expr env earg with
           None -> None
         | Some rarg ->
-            let _ = self#emit_tuple env ([Ctuple ([Cconst_pointer ifso; Cconst_pointer ifnot])]) in
             let rd = self#regs_for typ_int in
             let op = (Ispecific (Icamlisint)) in 
-            print_endline "===CIFTHENELSE===";
+            print_endline "===EMIT_EXPR_CIFTHENELSE===";
             Some (super#insert_op_debug op debug rarg rd)
         end
     ) else (
@@ -88,21 +88,29 @@ method! emit_expr (env:Selectgen.environment) exp =
     )
   | _ -> super#emit_expr env exp
 
-method private emit_tuple_not_flattened env exp_list =
-  let rec emit_list = function
-    [] -> []
-  | exp :: rem ->
-      (* Again, force right-to-left evaluation *)
-      let loc_rem = emit_list rem in
-      match self#emit_expr env exp with
-        None -> assert false  (* should have been caught in emit_parts *)
-      | Some loc_exp -> loc_exp :: loc_rem
-  in
-  emit_list exp_list
+method! emit_tail (env:Selectgen.environment) exp = 
+  match exp with 
+  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
+    print_endline ("EMIT TAIL CIF CIF CIF " ^ string_of_int ifso ^ string_of_int ifnot);
+    if (ifso = 1) && (ifnot = 3) then (
+      self#emit_return env (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot))    
+    ) else (
+      super#emit_tail env exp
+    )
+  | _ -> super#emit_tail env exp
 
-method private emit_tuple env exp_list =
-  Array.concat (self#emit_tuple_not_flattened env exp_list)
+method private emit_tail_sequence env exp =
+  let s = {< instr_seq = dummy_instr >} in
+  s#emit_tail env exp;
+  s#extract
 
+method private emit_return (env:Selectgen.environment) exp =
+  match self#emit_expr env exp with
+    None -> ()
+  | Some r ->
+      let loc = Proc.loc_results r in
+      super#insert_moves r loc;
+      super#insert Ireturn loc [||]
 end
 
 let fundecl f = (new selector)#emit_fundecl f
