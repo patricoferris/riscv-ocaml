@@ -86,6 +86,7 @@ let print_specific_operation printreg op ppf arg =
   | Imultsubf true ->
       fprintf ppf "-f (%a *f %a -f %a)"
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Icamlisint -> fprintf ppf "caml_is_int"
+  | Icamlisint -> fprintf ppf "cii %a %a 3"
+        printreg arg.(0) printreg arg.(1) 
   
   

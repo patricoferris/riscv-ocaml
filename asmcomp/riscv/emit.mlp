@@ -251,7 +251,7 @@ let name_for_specific = function
   | Imultaddf true  -> "fnmadd.d"
   | Imultsubf false -> "fmsub.d"
   | Imultsubf true  -> "fnmsub.d"
-  | Icamlisint      -> "caml_is_int"
+  | Icamlisint      -> "cii"
 
 (* Name of current function *)
 let function_name = ref ""
@@ -432,7 +432,7 @@ let emit_instr i =
       begin match sop with 
         | Icamlisint -> 
           let instr = name_for_specific sop in
-          ` {emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(0)}\n`
+          ` {emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int 3}\n`
         | _ -> 
           let instr = name_for_specific sop in
           `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
