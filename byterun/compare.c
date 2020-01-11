@@ -27,6 +27,10 @@
 #define isnan _isnan
 #endif
 
+/* Caml compares - automatically return 3 and 1 */
+#define Caml_greaterthan(res, x, y) ({asm("caml_gt %0, %1, %2" : "=r"(res) : "r"(x), "r"(y))})
+
+
 /* Structural comparison on trees. */
 
 struct compare_item { value * v1, * v2; mlsize_t count; };
@@ -350,10 +354,16 @@ CAMLprim value caml_lessequal(value v1, value v2)
   return Val_int(res <= 0 && res != UNORDERED);
 }
 
+value cgt(value v1) {
+  value res; 
+  asm("cgt  %0, %1, 0" : "=r"(res) : "r"(v1));
+  return res;
+}
+
 CAMLprim value caml_greaterthan(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res > 0);
+  return cgt(res);
 }
 
 CAMLprim value caml_greaterequal(value v1, value v2)
