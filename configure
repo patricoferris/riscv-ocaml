@@ -477,7 +477,7 @@ case "$ccfamily" in
 -fno-builtin-memcmp";
     internal_cflags="$gcc_warnings";;
   gcc-*)
-    common_cflags="-Os -fno-strict-aliasing -fwrapv";
+    common_cflags="-O2 -fno-strict-aliasing -fwrapv";
     internal_cflags="$gcc_warnings";;
   *)
     common_cflags="-O";;
