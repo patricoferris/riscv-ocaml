@@ -393,7 +393,7 @@ static void extern_rec(value v)
   sp = extern_stack;
 
   while(1) {
-  if (Is_long(v)) {
+  if (is_long(v)) {
     intnat n = Long_val(v);
     if (n >= 0 && n < 0x40) {
       write(PREFIX_SMALL_INT + n);

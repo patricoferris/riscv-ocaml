@@ -201,7 +201,7 @@ CAMLprim value caml_hash(value count, value limit, value seed, value obj)
   while (rd < wr && num > 0) {
     v = queue[rd++];
   again:
-    if (Is_long(v)) {
+    if (is_long(v)) {
       h = caml_hash_mix_intnat(h, v);
       num--;
     }
@@ -236,7 +236,7 @@ CAMLprim value caml_hash(value count, value limit, value seed, value obj)
            Forward_tag links being followed */
         for (i = MAX_FORWARD_DEREFERENCE; i > 0; i--) {
           v = Forward_val(v);
-          if (Is_long(v) || !Is_in_value_area(v) || Tag_val(v) != Forward_tag)
+          if (is_long(v) || !Is_in_value_area(v) || Tag_val(v) != Forward_tag)
             goto again;
         }
         /* Give up on this object and move to the next */
@@ -314,7 +314,7 @@ static void hash_aux(struct hash_state* h, value obj)
   if (h->univ_count < 0 || h->univ_limit < 0) return;
 
  again:
-  if (Is_long(obj)) {
+  if (is_long(obj)) {
     h->univ_count--;
     Combine(Long_val(obj));
     return;
