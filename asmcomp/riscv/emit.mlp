@@ -251,7 +251,7 @@ let name_for_specific = function
   | Imultaddf true  -> "fnmadd.d"
   | Imultsubf false -> "fmsub.d"
   | Imultsubf true  -> "fnmsub.d"
-  | Icamlisint      -> "caml_is_int"
+  | Icamlisint      -> "cii"
   | Iandn           -> "andn"
   | Iorn            -> "orn"
   | Ixorn           -> "xorn"
