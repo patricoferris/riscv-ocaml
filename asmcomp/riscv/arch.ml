@@ -23,10 +23,13 @@ let command_line_options = []
 type specific_operation =
   | Imultaddf of bool                   (* multiply, optionally negate, and add *)
   | Imultsubf of bool                   (* multiply, optionally negate, and subtract *)
-  | Icamlisint                          (* HELP ME *)
+  | Icamlisint                          (* check lsb and store ocaml true/false values *)
+  | Iandn                               (* logical and with the second argument negated *)
+  | Iorn                                (* logical or with the second argument negated *)
+  | Ixorn                               (* logical xor with the second arguent negated *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Icamlisint -> false
+  | Imultaddf _ | Imultsubf _ | Icamlisint | Iandn | Ixorn | Iorn -> false
 
 (* Addressing modes *)
 
@@ -86,6 +89,12 @@ let print_specific_operation printreg op ppf arg =
   | Imultsubf true ->
       fprintf ppf "-f (%a *f %a -f %a)"
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Icamlisint -> fprintf ppf "caml_is_int"
-  
+  | Icamlisint -> fprintf ppf "cii %a %a 3"
+        printreg arg.(0) printreg arg.(1) 
+  | Iandn -> fprintf ppf "andn %a %a %a"
+        printreg arg.(0) printreg arg.(1) printreg arg.(2)
+  | Iorn -> fprintf ppf "orn %a %a %a"
+        printreg arg.(0) printreg arg.(1) printreg arg.(2)
+  | Ixorn -> fprintf ppf "xorn %a %a %a"
+        printreg arg.(0) printreg arg.(1) printreg arg.(2)
   

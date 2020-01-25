@@ -50,6 +50,13 @@ method! select_operation op args dbg =
   | (Ccmpi comp, args) -> (Iintop(Icomp (Isigned comp)), args)
   | (Ccmpa comp, args) -> (Iintop(Icomp (Iunsigned comp)), args)
   | (Cmuli, _) -> (Iintop Imul, args)
+  (* Bit manipulation extensions *)
+  | (Cand, [_arg3; Cop(Cor, [Cop(Cxor, [_arg1; _arg2], _); _arg4], _)]) ->
+      (Ispecific (Iandn), [_arg3; _arg1; _arg2]) 
+  | (Cor, [_arg3; Cop(Cor, [Cop(Cxor, [_arg1; _arg2], _); _arg4], _)]) ->
+      (Ispecific (Iorn), [_arg3; _arg1; _arg2])
+  | (Cor, [Cop(Cxor, [_arg3; Cop(Cxor, [_arg1; _arg2], _)], _); _imm]) ->
+      (Ispecific (Ixorn), [_arg3; _arg1; _arg2])
   | _ ->
       super#select_operation op args dbg
 
