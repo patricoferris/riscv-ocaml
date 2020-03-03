@@ -681,6 +681,10 @@ else
                      echo "#define ARCH_SIXTYFOUR" >> m.h
                      set 4 4 8 2 8
                      arch64=true;;
+    riscv32-*-linux*) inf "OK, this is a regular 32 bit architecture."
+                     echo "#undef ARCH_SIXTYFOUR" >> m.h
+                     set 4 4 4 2 8
+                     arch64=false;;
     riscv64-*-linux*) inf "Wow! A 64 bit architecture!"
                      echo "#define ARCH_SIXTYFOUR" >> m.h
                      set 4 8 8 2 8
