@@ -28,6 +28,25 @@
 
 CAMLextern void caml_main (char_os **);
 
+#ifdef __x86_64__
+uintnat rd_cycles(value unit)
+{
+  unsigned long cycles;
+  unsigned int lo,hi;
+  asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+  return ((uint64_t)hi << 32) | lo;
+}
+#endif
+
+#ifdef __riscv
+uintnat rd_cycles(value unit)
+{
+  uintnat cycles;
+  asm volatile ("rdcycle %0" : "=r" (cycles));
+  return cycles;
+}
+#endif
+
 #ifdef _WIN32
 CAMLextern void caml_expand_command_line (int *, wchar_t ***);
 
@@ -40,8 +59,9 @@ int main(int argc, char **argv)
   /* Expand wildcards and diversions in command line */
   caml_expand_command_line(&argc, &argv);
 #endif
-
+  rd_cycles();
   caml_main(argv);
+  rd_cycles();
   caml_sys_exit(Val_int(0));
   return 0; /* not reached */
 }
