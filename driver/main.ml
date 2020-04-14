@@ -37,6 +37,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _cc s = c_compiler := Some s
   let _cclib s = Compenv.defer (ProcessObjects (Misc.rev_split_words s))
   let _ccopt s = first_ccopts := s :: !first_ccopts
+  let _riscv s = riscv_arch := Some s 
   let _compat_32 = set bytecode_compatible_32
   let _config = show_config
   let _custom = set custom_runtime
