@@ -85,6 +85,7 @@ val bytecode_compatible_32 : bool ref
 val output_c_object : bool ref
 val output_complete_object : bool ref
 val all_ccopts : string list ref
+val riscv_arch : string option ref 
 val classic : bool ref
 val nopervasives : bool ref
 val open_modules : string list ref

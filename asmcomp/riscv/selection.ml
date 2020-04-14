@@ -90,7 +90,7 @@ method! emit_expr (env:Selectgen.environment) exp =
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    if (ifso = 1) && (ifnot = 3) && (!riscv_arch = "cii") then (
+    if (ifso = 1) && (ifnot = 3) && (!riscv_arch <> None) then (
       self#emit_return env (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot))    
     ) else (
       super#emit_tail env exp
