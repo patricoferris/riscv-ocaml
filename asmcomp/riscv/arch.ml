@@ -89,4 +89,19 @@ let print_specific_operation printreg op ppf arg =
   | Icamlisint -> fprintf ppf "cii %a %a 3"
         printreg arg.(0) printreg arg.(1) 
   
+(* Configuring Extensions *)
+type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool }
+let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false}
+
+let mk_config = function 
+  | None -> empty_config 
+  | Some s -> 
+    let matching conf = function 
+      | 'z' -> {conf with iszero = true}
+      | 'a' -> {conf with arith = true}
+      | 'b' -> {conf with bitmanip = true}
+      | 'j' -> {conf with jtbl = true}
+      |  _  -> conf
+    in 
+      Seq.fold_left matching empty_config (String.to_seq s)
   

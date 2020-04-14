@@ -15,13 +15,14 @@
 open Cmm
 open Arch
 open Mach
-open Clflags
 
 (* Instruction selection *)
 
 class selector = object (self)
 
 inherit Selectgen.selector_generic as super
+
+val rvconfig = mk_config Clflags.riscv_arch 
 
 method is_immediate n = is_immediate n
 
@@ -90,7 +91,7 @@ method! emit_expr (env:Selectgen.environment) exp =
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    if (ifso = 1) && (ifnot = 3) && (!riscv_arch <> None) then (
+    if (ifso = 1) && (ifnot = 3) && (rvconfig.iszero) then (
       self#emit_return env (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot))    
     ) else (
       super#emit_tail env exp
