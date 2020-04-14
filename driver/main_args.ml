@@ -47,7 +47,7 @@ let mk_ccopt f =
 ;;
 
 let mk_riscv f =
-  "-riscv", Arg.string f,
+  "-riscv", Arg.String f,
   "<arch> Pass architecture parameters to compile to target extension"
 ;;
 
