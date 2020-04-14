@@ -68,6 +68,7 @@ module type Compiler_options = sig
   val _cc : string -> unit
   val _cclib : string -> unit
   val _ccopt : string -> unit
+  val _riscv : string -> unit 
   val _config : unit -> unit
   val _for_pack : string -> unit
   val _g : unit -> unit
