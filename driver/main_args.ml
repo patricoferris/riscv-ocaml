@@ -46,6 +46,11 @@ let mk_ccopt f =
   "<opt>  Pass option <opt> to the C compiler and linker"
 ;;
 
+let mk_riscv f =
+  "-riscv", Arg.string f,
+  "<arch> Pass architecture parameters to compile to target extension"
+;;
+
 let mk_clambda_checks f =
   "-clambda-checks", Arg.Unit f, " Instrument clambda code with closure and \
     field access checks (for debugging the compiler)"
@@ -841,6 +846,7 @@ module type Compiler_options = sig
   val _cc : string -> unit
   val _cclib : string -> unit
   val _ccopt : string -> unit
+  val _riscv : string -> unit
   val _config : unit -> unit
   val _for_pack : string -> unit
   val _g : unit -> unit
@@ -1024,6 +1030,7 @@ struct
     mk_cc F._cc;
     mk_cclib F._cclib;
     mk_ccopt F._ccopt;
+    mk_riscv F._riscv;
     mk_color F._color;
     mk_compat_32 F._compat_32;
     mk_config F._config;
@@ -1185,6 +1192,7 @@ struct
     mk_cc F._cc;
     mk_cclib F._cclib;
     mk_ccopt F._ccopt;
+    mk_riscv F._riscv;
     mk_clambda_checks F._clambda_checks;
     mk_classic_inlining F._classic_inlining;
     mk_color F._color;
