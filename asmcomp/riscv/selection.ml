@@ -15,6 +15,7 @@
 open Cmm
 open Arch
 open Mach
+open Clflags
 
 (* Instruction selection *)
 
@@ -72,7 +73,6 @@ method! select_condition = function
 method! emit_expr (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    print_endline ("CIF CIF CIF " ^ string_of_int ifso ^ string_of_int ifnot);
     if (ifso = 1) && (ifnot = 3) then (
       let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
       begin match self#emit_expr env earg with
@@ -80,7 +80,6 @@ method! emit_expr (env:Selectgen.environment) exp =
         | Some rarg ->
             let rd = self#regs_for typ_int in
             let op = (Ispecific (Icamlisint)) in 
-            print_endline "===EMIT_EXPR_CIFTHENELSE===";
             Some (super#insert_op_debug op debug rarg rd)
         end
     ) else (
@@ -91,8 +90,7 @@ method! emit_expr (env:Selectgen.environment) exp =
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    print_endline ("EMIT TAIL CIF CIF CIF " ^ string_of_int ifso ^ string_of_int ifnot);
-    if (ifso = 1) && (ifnot = 3) then (
+    if (ifso = 1) && (ifnot = 3) && (!riscv_arch = "cii") then (
       self#emit_return env (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot))    
     ) else (
       super#emit_tail env exp
