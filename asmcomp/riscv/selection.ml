@@ -71,7 +71,7 @@ method! select_condition = function
 
 (* Emitting Custom Instructions *)
 
-method! emit_expr (env:Selectgen.environment) exp = 
+(* method! emit_expr (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
     if (ifso = 1) && (ifnot = 3) then (
@@ -86,19 +86,25 @@ method! emit_expr (env:Selectgen.environment) exp =
     ) else (
       super#emit_expr env exp
     )
-  | _ -> super#emit_expr env exp
+  | _ -> super#emit_expr env exp *)
 
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
-  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    if (ifso = 1) && (ifnot = 3) && (rvconfig.iszero) then (
-      self#emit_return env (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot))    
+  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
+    if rvconfig.iszero then (
+      let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
+      match self#insert_op (Ispecific(Iisone)) with 
+        | None -> () 
+        | Some r -> 
+          let loc = Proc.loc_results r in
+          self#insert_moves r loc;
+          self#insert Ireturn loc [||]
     ) else (
       super#emit_tail env exp
     )
   | _ -> super#emit_tail env exp
 
-method private emit_tail_sequence env exp =
+(* method private emit_tail_sequence env exp =
   let s = {< instr_seq = dummy_instr >} in
   s#emit_tail env exp;
   s#extract
@@ -109,7 +115,7 @@ method private emit_return (env:Selectgen.environment) exp =
   | Some r ->
       let loc = Proc.loc_results r in
       super#insert_moves r loc;
-      super#insert Ireturn loc [||]
+      super#insert Ireturn loc [||] *)
 end
 
 let fundecl f = (new selector)#emit_fundecl f

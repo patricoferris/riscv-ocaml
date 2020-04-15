@@ -23,10 +23,10 @@ let command_line_options = []
 type specific_operation =
   | Imultaddf of bool                   (* multiply, optionally negate, and add *)
   | Imultsubf of bool                   (* multiply, optionally negate, and subtract *)
-  | Icamlisint                          (* HELP ME *)
+  | Iisone                              (* customisation for checking if something is 1 (OCaml 0) *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Icamlisint -> false
+  | Imultaddf _ | Imultsubf _ | Iisone -> false
 
 (* Addressing modes *)
 
@@ -86,7 +86,7 @@ let print_specific_operation printreg op ppf arg =
   | Imultsubf true ->
       fprintf ppf "-f (%a *f %a -f %a)"
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
-  | Icamlisint -> fprintf ppf "cii %a %a 3"
+  | Iisone -> fprintf ppf "ocio %a %a 3"
         printreg arg.(0) printreg arg.(1) 
   
 (* Configuring Extensions *)

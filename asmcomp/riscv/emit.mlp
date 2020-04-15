@@ -251,7 +251,7 @@ let name_for_specific = function
   | Imultaddf true  -> "fnmadd.d"
   | Imultsubf false -> "fmsub.d"
   | Imultsubf true  -> "fnmsub.d"
-  | Icamlisint      -> "cii"
+  | Iisone      -> "ocio"
 
 (* Name of current function *)
 let function_name = ref ""
@@ -430,9 +430,9 @@ let emit_instr i =
       `	{emit_string name}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}\n`
   | Lop(Ispecific sop) ->
       begin match sop with 
-        | Icamlisint -> 
+        | Iisone -> 
           let instr = name_for_specific sop in
-          ` {emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int 3}\n`
+          ` {emit_string instr} {emit_reg i.res.(0)}, {emit_reg i.arg.(0)}\n`
         | _ -> 
           let instr = name_for_specific sop in
           `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
