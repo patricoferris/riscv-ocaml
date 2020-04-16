@@ -255,7 +255,7 @@ static inline value* mark_slice_darken(value *gray_vals_ptr, value v, int i,
     chd = Hd_val (child);
     if (Tag_hd (chd) == Forward_tag){
       value f = Forward_val (child);
-      if ((in_ephemeron && is_long(f)) ||
+      if ((in_ephemeron && Is_long(f)) ||
           (Is_block (f)
            && (!Is_in_value_area(f) || Tag_val (f) == Forward_tag
                || Tag_val (f) == Lazy_tag
@@ -327,7 +327,7 @@ static value* mark_ephe_aux (value *gray_vals_ptr, intnat *work,
           Is_block (key) && Is_in_heap (key)){
         if (Tag_val (key) == Forward_tag){
           value f = Forward_val (key);
-          if (is_long (f) ||
+          if (Is_long (f) ||
               (Is_block (f) &&
                (!Is_in_value_area(f) || Tag_val (f) == Forward_tag
                 || Tag_val (f) == Lazy_tag

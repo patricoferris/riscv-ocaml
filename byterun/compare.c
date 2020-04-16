@@ -354,16 +354,10 @@ CAMLprim value caml_lessequal(value v1, value v2)
   return Val_int(res <= 0 && res != UNORDERED);
 }
 
-value cgt(value v1) {
-  value res; 
-  asm("cgt  %0, %1, 0" : "=r"(res) : "r"(v1));
-  return res;
-}
-
 CAMLprim value caml_greaterthan(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return cgt(res);
+  return Val_int(res > 0);
 }
 
 CAMLprim value caml_greaterequal(value v1, value v2)

@@ -53,13 +53,6 @@ void caml_set_fields (value v, unsigned long start, unsigned long filler)
 
 uintnat caml_verb_gc = 0;
 
-/* Inlinable is_long function for RISC-V */
-inline int is_long(value x) {
-    int res;
-    asm("cii  %0, %1, 1" : "=r"(res) : "r"(x));
-    return res;
-}
-
 void caml_gc_message (int level, char *msg, ...)
 {
   if ((caml_verb_gc & level) != 0){

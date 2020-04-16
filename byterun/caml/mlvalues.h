@@ -70,7 +70,6 @@ typedef uintnat mark_t;
 // #define Is_long(x) ({ int res; asm("cii %0, %1, 1" : "=r" (res) : "r" (x)); res; })
 #define Is_block(x)  (((x) & 1) == 0)
 // #define Is_block(x)  ({ int res; asm("cii %0, %1, 1" : "=r" (res) : "r" (x)); !res; })
-CAMLextern int is_long(value x);
 /* Conversion macro names are always of the form  "to_from". */
 /* Example: Val_long as in "Val from long" or "Val of long". */
 #define Val_long(x)     ((intnat) (((uintnat)(x) << 1)) + 1)
