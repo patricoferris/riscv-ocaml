@@ -97,7 +97,7 @@ method! emit_tail (env:Selectgen.environment) exp =
         | None -> () 
         | Some rarg -> 
           let ret = self#regs_for typ_int in 
-          let r = self#insert_op (Ispecific(Ioceq)) rarg [||] in 
+          let r = self#insert_op (Ispecific(Ioceq)) rarg ret in 
           let r = self#insert_op (Ispecific(Iocval)) r ret in
           let loc = Proc.loc_results r in
             self#insert_moves r loc;
