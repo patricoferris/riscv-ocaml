@@ -75,7 +75,7 @@ CAMLexport char * caml_format_exception(value exn)
     for (i = start; i < Wosize_val(bucket); i++) {
       if (i > start) add_string(&buf, ", ");
       v = Field(bucket, i);
-      if (is_long(v)) {
+      if (Is_long(v)) {
         snprintf(intbuf, sizeof(intbuf),
                  "%" ARCH_INTNAT_PRINTF_FORMAT "d", Long_val(v));
         add_string(&buf, intbuf);

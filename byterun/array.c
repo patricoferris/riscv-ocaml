@@ -364,7 +364,7 @@ CAMLprim value caml_make_array(value init)
     CAMLreturn (init);
   } else {
     v = Field(init, 0);
-    if (is_long(v)
+    if (Is_long(v)
         || ! Is_in_value_area(v)
         || Tag_val(v) != Double_tag) {
       CAMLreturn (init);

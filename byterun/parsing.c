@@ -119,14 +119,14 @@ static void print_token(struct parser_tables *tables, int state, value tok)
 {
   value v;
 
-  if (is_long(tok)) {
+  if (Is_long(tok)) {
     fprintf(stderr, "State %d: read token %s\n",
             state, token_name(tables->names_const, Int_val(tok)));
   } else {
     fprintf(stderr, "State %d: read token %s(",
             state, token_name(tables->names_block, Tag_val(tok)));
     v = Field(tok, 0);
-    if (is_long(v))
+    if (Is_long(v))
       fprintf(stderr, "%" ARCH_INTNAT_PRINTF_FORMAT "d", Long_val(v));
     else if (Tag_val(v) == String_tag)
       fprintf(stderr, "%s", String_val(v));

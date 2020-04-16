@@ -55,7 +55,7 @@ CAMLprim value caml_obj_is_block(value arg)
 
 CAMLprim value caml_obj_tag(value arg)
 {
-  if (is_long (arg)){
+  if (Is_long (arg)){
     return Val_int (1000);   /* int_tag */
   }else if ((long) arg & (sizeof (value) - 1)){
     return Val_int (1002);   /* unaligned_tag */
@@ -290,7 +290,7 @@ CAMLprim value caml_obj_reachable_words(value v)
   header_t hd;
   mlsize_t sz;
 
-  if (is_long(v) || !Is_in_heap_or_young(v)) return Val_int(0);
+  if (Is_long(v) || !Is_in_heap_or_young(v)) return Val_int(0);
   if (Tag_hd(Hd_val(v)) == Infix_tag) v -= Infix_offset_hd(Hd_val(v));
   hd = Hd_val(v);
   sz = Wosize_hd(hd);
