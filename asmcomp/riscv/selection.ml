@@ -90,15 +90,18 @@ method! select_condition = function
 
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
-  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
+  | (Cifthenelse (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
     if rvconfig.iszero then (
-      let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
-      match self#insert_op (Ispecific(Iisone)) with 
+      let (_cond, earg) = self#select_condition (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], debug)) in
+      match self#emit_expr env earg with 
         | None -> () 
-        | Some r -> 
+        | Some rarg -> 
+          let ret = self#regs_for typ_int in 
+          let r = self#insert_op (Ispecific(Ioceq)) rarg [||] in 
+          let r = self#insert_op (Ispecific(Iocval)) r ret in
           let loc = Proc.loc_results r in
-          self#insert_moves r loc;
-          self#insert Ireturn loc [||]
+            self#insert_moves r loc;
+            self#insert Ireturn loc [||]
     ) else (
       super#emit_tail env exp
     )

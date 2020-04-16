@@ -23,10 +23,11 @@ let command_line_options = []
 type specific_operation =
   | Imultaddf of bool                   (* multiply, optionally negate, and add *)
   | Imultsubf of bool                   (* multiply, optionally negate, and subtract *)
-  | Iisone                              (* customisation for checking if something is 1 (OCaml 0) *)
+  | Ioceq                               (* customisation for checking if something is equal to immediate *)
+  | Iocval                              (* shift logical left 1 and add immediate (1 for OCaml value) *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Iisone -> false
+  | Imultaddf _ | Imultsubf _ | Ioceq | Iocval -> false
 
 (* Addressing modes *)
 
@@ -88,6 +89,7 @@ let print_specific_operation printreg op ppf arg =
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
   | Iisone -> fprintf ppf "ocio %a %a 3"
         printreg arg.(0) printreg arg.(1) 
+  | Iocval -> fprintf ppf ""
   
 (* Configuring Extensions *)
 type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool }
