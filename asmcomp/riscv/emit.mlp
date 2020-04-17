@@ -517,7 +517,7 @@ let emit_instr i =
       end
   | Lswitch jumptbl -> (* FIXME FIXME ? *)
       let lbl = new_label() in
-        if rvconfig.jtbl then (
+        if (mk_config !Clflags.riscv_arch).jtbl then (
           `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
           `	ocjmp	x0, {emit_reg i.arg.(0)}, {emit_reg reg_tmp1}\n`;
           `{emit_label lbl}:\n`
