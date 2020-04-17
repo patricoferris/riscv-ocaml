@@ -90,9 +90,9 @@ let print_specific_operation printreg op ppf arg =
       fprintf ppf "-f (%a *f %a -f %a)"
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
   | Iocadd -> 
-      fprintf ppf "%a + %a" printref arg.(0) printref arg.(1)
+      fprintf ppf "%a + %a" printreg arg.(0) printreg arg.(1)
   | Iocsub -> 
-      fprintf ppf "%a - %a" printref arg.(0) printref arg.(1)
+      fprintf ppf "%a - %a" printreg arg.(0) printreg arg.(1)
   | Ioceq -> fprintf ppf "oceq %a %a"
         printreg arg.(0) printreg arg.(1) 
   | Iocval -> fprintf ppf ""

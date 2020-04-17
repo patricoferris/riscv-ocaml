@@ -53,9 +53,9 @@ method! select_operation op args dbg =
   | (Ccmpa comp, args) -> (Iintop(Icomp (Iunsigned comp)), args)
   | (Cmuli, _) -> (Iintop Imul, args)
   (* RISC-V Custom OCaml Extensions *)
-  | (Caddi, [Cop(Caddi, [arg1; arg2], _); Const_pointer -1]) -> 
+  | (Caddi, [Cop(Caddi, [arg1; arg2], _); Const_pointer -1]) when rvconfig.arith -> 
     (Ispecific Iocadd, [arg1; arg2])
-  | (Caddi, [Cop(Csubi, [arg1; arg2], _); Const_pointer 1]) -> 
+  | (Caddi, [Cop(Csubi, [arg1; arg2], _); Const_pointer 1]) when rvconfig.arith -> 
     (Ispecific Iocsub, [arg1; arg2])
   | _ ->
       super#select_operation op args dbg
