@@ -433,9 +433,9 @@ let emit_instr i =
       let instr = name_for_specific sop in
         begin match sop with 
           | Ioceq -> 
-            ` {emit_string instr} {emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
+            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
           | Iocval -> 
-            ` {emit_string instr} {emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
+            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
           | _ -> 
             let instr = name_for_specific sop in
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
