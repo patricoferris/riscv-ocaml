@@ -517,11 +517,17 @@ let emit_instr i =
       end
   | Lswitch jumptbl -> (* FIXME FIXME ? *)
       let lbl = new_label() in
-      `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
-      `	slli	{emit_reg reg_tmp2}, {emit_reg i.arg.(0)}, 2\n`;
-      `	add	{emit_reg reg_tmp1}, {emit_reg reg_tmp1}, {emit_reg reg_tmp2}\n`;
-      `	jr	{emit_reg reg_tmp1}\n`;
-      `{emit_label lbl}:\n`;
+        if rvconfig.jtbl then (
+          `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
+          `	ocjmp	x0, {emit_reg i.arg.(0)}, {emit_reg reg_tmp1}\n`;
+          `{emit_label lbl}:\n`
+        ) else (
+          `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
+          `	slli	{emit_reg reg_tmp2}, {emit_reg i.arg.(0)}, 2\n`;
+          `	add	{emit_reg reg_tmp1}, {emit_reg reg_tmp1}, {emit_reg reg_tmp2}\n`;
+          `	jr	{emit_reg reg_tmp1}\n`;
+          `{emit_label lbl}:\n`
+        );
       for i = 0 to Array.length jumptbl - 1 do
         `	j	{emit_label jumptbl.(i)}\n`
       done
