@@ -25,9 +25,11 @@ type specific_operation =
   | Imultsubf of bool                   (* multiply, optionally negate, and subtract *)
   | Ioceq                               (* customisation for checking if something is equal to immediate *)
   | Iocval                              (* shift logical left 1 and add immediate (1 for OCaml value) *)
+  | Iocadd                              (* OCaml integer adding - automatically subtracts 1 *)
+  | Iocsub                              (* OCaml integer subtraction - automatically adds 1 *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Ioceq | Iocval -> false
+  | Imultaddf _ | Imultsubf _ | Ioceq | Iocval | Iocadd | Iocsub -> false
 
 (* Addressing modes *)
 
@@ -87,6 +89,10 @@ let print_specific_operation printreg op ppf arg =
   | Imultsubf true ->
       fprintf ppf "-f (%a *f %a -f %a)"
         printreg arg.(0) printreg arg.(1) printreg arg.(2)
+  | Iocadd -> 
+      fprintf ppf "%a + %a" printref arg.(0) printref arg.(1)
+  | Iocsub -> 
+      fprintf ppf "%a - %a" printref arg.(0) printref arg.(1)
   | Ioceq -> fprintf ppf "oceq %a %a"
         printreg arg.(0) printreg arg.(1) 
   | Iocval -> fprintf ppf ""

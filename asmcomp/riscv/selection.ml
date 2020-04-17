@@ -52,6 +52,11 @@ method! select_operation op args dbg =
   | (Ccmpi comp, args) -> (Iintop(Icomp (Isigned comp)), args)
   | (Ccmpa comp, args) -> (Iintop(Icomp (Iunsigned comp)), args)
   | (Cmuli, _) -> (Iintop Imul, args)
+  (* RISC-V Custom OCaml Extensions *)
+  | (Caddi, [Cop(Caddi, [arg1; arg2], _); Const_pointer -1]) -> 
+    (Ispecific Iocadd, [arg1; arg2])
+  | (Caddi, [Cop(Csubi, [arg1; arg2], _); Const_pointer 1]) -> 
+    (Ispecific Iocsub, [arg1; arg2])
   | _ ->
       super#select_operation op args dbg
 
@@ -71,23 +76,6 @@ method! select_condition = function
 
 (* Emitting Custom Instructions *)
 
-(* method! emit_expr (env:Selectgen.environment) exp = 
-  match exp with 
-  | (Cifthenelse (Cop(Ccmpi Cne, [a; Cconst_int 1], debug), Cconst_pointer ifso, Cconst_pointer ifnot)) -> 
-    if (ifso = 1) && (ifnot = 3) then (
-      let (_, earg) = self#select_condition (Cop(Ccmpi Cne, [a; Cconst_int 1], debug)) in
-      begin match self#emit_expr env earg with
-          None -> None
-        | Some rarg ->
-            let rd = self#regs_for typ_int in
-            let op = (Ispecific (Icamlisint)) in 
-            Some (super#insert_op_debug op debug rarg rd)
-        end
-    ) else (
-      super#emit_expr env exp
-    )
-  | _ -> super#emit_expr env exp *)
-
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
@@ -106,19 +94,6 @@ method! emit_tail (env:Selectgen.environment) exp =
       super#emit_tail env exp
     )
   | _ -> super#emit_tail env exp
-
-(* method private emit_tail_sequence env exp =
-  let s = {< instr_seq = dummy_instr >} in
-  s#emit_tail env exp;
-  s#extract
-
-method private emit_return (env:Selectgen.environment) exp =
-  match self#emit_expr env exp with
-    None -> ()
-  | Some r ->
-      let loc = Proc.loc_results r in
-      super#insert_moves r loc;
-      super#insert Ireturn loc [||] *)
 end
 
 let fundecl f = (new selector)#emit_fundecl f

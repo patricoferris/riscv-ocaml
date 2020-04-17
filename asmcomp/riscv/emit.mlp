@@ -436,6 +436,8 @@ let emit_instr i =
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
           | Iocval -> 
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
+          | Iocadd | Iocsub -> 
+            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
           | _ -> 
             let instr = name_for_specific sop in
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}, {emit_reg i.arg.(2)}\n`
