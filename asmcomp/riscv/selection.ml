@@ -53,10 +53,12 @@ method! select_operation op args dbg =
   | (Ccmpa comp, args) -> (Iintop(Icomp (Iunsigned comp)), args)
   | (Cmuli, _) -> (Iintop Imul, args)
   (* RISC-V Custom OCaml Extensions *)
-  | (Caddi, [Cop(Caddi, [arg1; arg2], _); Cconst_pointer -1]) when rvconfig.arith -> 
+  | (Caddi, [Cop(Caddi, [arg1; arg2], _); Cconst_int -1]) when rvconfig.arith -> 
     (Ispecific Iocadd, [arg1; arg2])
-  | (Caddi, [Cop(Csubi, [arg1; arg2], _); Cconst_pointer 1]) when rvconfig.arith -> 
+  | (Caddi, [Cop(Csubi, [arg1; arg2], _); Cconst_int 1]) when rvconfig.arith -> 
     (Ispecific Iocsub, [arg1; arg2])
+  | (Caddi, [Cop(Clsl, [arg1; Cconst_int 1], _); Cconst_int n]) 
+      when rvconfig.shiftadd && self#is_immediate n -> (Ispecific (Iocval n), [arg1])
   | _ ->
       super#select_operation op args dbg
 
@@ -85,8 +87,8 @@ method! emit_tail (env:Selectgen.environment) exp =
         | None -> () 
         | Some rarg -> 
           let ret = self#regs_for typ_int in 
-          let r = self#insert_op (Ispecific(Ioceq)) rarg ret in 
-          let r = self#insert_op (Ispecific(Iocval)) r ret in
+          let r = self#insert_op (Ispecific(Ioceq 1)) rarg ret in 
+          let r = self#insert_op (Ispecific(Iocval 1)) r ret in
           let loc = Proc.loc_results r in
             self#insert_moves r loc;
             self#insert Ireturn loc [||]

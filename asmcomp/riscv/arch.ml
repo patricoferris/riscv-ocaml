@@ -23,13 +23,13 @@ let command_line_options = []
 type specific_operation =
   | Imultaddf of bool                   (* multiply, optionally negate, and add *)
   | Imultsubf of bool                   (* multiply, optionally negate, and subtract *)
-  | Ioceq                               (* customisation for checking if something is equal to immediate *)
-  | Iocval                              (* shift logical left 1 and add immediate (1 for OCaml value) *)
+  | Ioceq of int                        (* customisation for checking if something is equal to immediate *)
+  | Iocval of int                       (* shift logical left 1 and add immediate (1 for OCaml value) *)
   | Iocadd                              (* OCaml integer adding - automatically subtracts 1 *)
   | Iocsub                              (* OCaml integer subtraction - automatically adds 1 *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Ioceq | Iocval | Iocadd | Iocsub -> false
+  | Imultaddf _ | Imultsubf _ | Ioceq _ | Iocval _ | Iocadd | Iocsub -> false
 
 (* Addressing modes *)
 
@@ -93,13 +93,14 @@ let print_specific_operation printreg op ppf arg =
       fprintf ppf "%a + %a" printreg arg.(0) printreg arg.(1)
   | Iocsub -> 
       fprintf ppf "%a - %a" printreg arg.(0) printreg arg.(1)
-  | Ioceq -> fprintf ppf "oceq %a %a"
-        printreg arg.(0) printreg arg.(1) 
-  | Iocval -> fprintf ppf ""
+  | Ioceq n -> fprintf ppf "%a = %i"
+        printreg arg.(0) n 
+  | Iocval n -> fprintf ppf "%a << 1 + %i" 
+        printreg arg.(0) n
   
 (* Configuring Extensions *)
-type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool }
-let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false}
+type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool }
+let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false; shiftadd = false}
 
 let mk_config = function 
   | None -> empty_config 
@@ -109,6 +110,7 @@ let mk_config = function
       | 'a' -> {conf with arith = true}
       | 'b' -> {conf with bitmanip = true}
       | 'j' -> {conf with jtbl = true}
+      | 's' -> {conf with shiftadd = true}
       |  _  -> conf
     in 
       Seq.fold_left matching empty_config (String.to_seq s)

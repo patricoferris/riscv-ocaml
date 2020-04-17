@@ -251,8 +251,10 @@ let name_for_specific = function
   | Imultaddf true  -> "fnmadd.d"
   | Imultsubf false -> "fmsub.d"
   | Imultsubf true  -> "fnmsub.d"
-  | Ioceq           -> "oceqi"
-  | Iocval          -> "ocvali"
+  | Ioceq _         -> "oceqi"
+  | Iocval _        -> "ocvali"
+  | Iocadd          -> "ocadd"
+  | Iocsub          -> "ocsub"
 
 (* Name of current function *)
 let function_name = ref ""
@@ -432,10 +434,10 @@ let emit_instr i =
   | Lop(Ispecific sop) ->
       let instr = name_for_specific sop in
         begin match sop with 
-          | Ioceq -> 
-            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
-          | Iocval -> 
-            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, 1\n`
+          | Ioceq n -> 
+            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int n}\n`
+          | Iocval n -> 
+            `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int n}\n`
           | Iocadd | Iocsub -> 
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
           | _ -> 
