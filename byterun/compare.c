@@ -333,35 +333,35 @@ CAMLprim value caml_compare(value v1, value v2)
 CAMLprim value caml_equal(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res == 0);
+  return Opt_val_long(res == 0);
 }
 
 CAMLprim value caml_notequal(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res != 0);
+  return Opt_val_long(res != 0);
 }
 
 CAMLprim value caml_lessthan(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res < 0 && res != UNORDERED);
+  return Opt_val_long(res < 0 && res != UNORDERED);
 }
 
 CAMLprim value caml_lessequal(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res <= 0 && res != UNORDERED);
+  return Opt_val_long(res <= 0 && res != UNORDERED);
 }
 
 CAMLprim value caml_greaterthan(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res > 0);
+  return Opt_val_long(res > 0);
 }
 
 CAMLprim value caml_greaterequal(value v1, value v2)
 {
   intnat res = compare_val(v1, v2, 0);
-  return Val_int(res >= 0);
+  return Opt_val_long(res >= 0);
 }

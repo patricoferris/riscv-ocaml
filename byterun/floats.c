@@ -397,7 +397,7 @@ CAMLprim value caml_frexp_float(value f)
   mantissa = caml_copy_double(frexp (Double_val(f), &exponent));
   res = caml_alloc_tuple(2);
   Field(res, 0) = mantissa;
-  Field(res, 1) = Val_int(exponent);
+  Field(res, 1) = Opt_val_long(exponent);
   CAMLreturn (res);
 }
 
@@ -649,7 +649,7 @@ CAMLprim value caml_gt_float DEFINE_NAN_CMP(>)
 
 CAMLprim value caml_float_compare(value vf, value vg)
 {
-  return Val_int(caml_float_compare_unboxed(Double_val(vf),Double_val(vg)));
+  return Opt_val_long(caml_float_compare_unboxed(Double_val(vf),Double_val(vg)));
 }
 
 enum { FP_normal, FP_subnormal, FP_zero, FP_infinite, FP_nan };

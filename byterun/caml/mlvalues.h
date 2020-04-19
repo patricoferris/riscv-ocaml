@@ -72,9 +72,9 @@ typedef uintnat mark_t;
 // #define Is_block(x)  ({ int res; asm("cii %0, %1, 1" : "=r" (res) : "r" (x)); !res; })
 /* Conversion macro names are always of the form  "to_from". */
 /* Example: Val_long as in "Val from long" or "Val of long". */
-// #define Val_long(x)     ((intnat) (((uintnat)(x) << 1)) + 1)
-#define Val_long(x) \
-  ({ int res; asm("ocvali %0, %1, 1" : "=r" (res) : "r" ((uintnat) x)); (intnat) res; })
+#define Val_long(x)     ((intnat) (((uintnat)(x) << 1)) + 1)
+#define Opt_val_long(x) \
+  ({ int res; asm("ocvali %0, %1, 1" : "=r" (res) : "r" ((uintnat) (x))); (intnat) res; })
 #define Long_val(x)     ((x) >> 1)
 #define Max_long (((intnat)1 << (8 * sizeof(value) - 2)) - 1)
 #define Min_long (-((intnat)1 << (8 * sizeof(value) - 2)))

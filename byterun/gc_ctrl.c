@@ -243,19 +243,19 @@ static value heap_stats (int returnstats)
     Store_field (res, 0, caml_copy_double (minwords));
     Store_field (res, 1, caml_copy_double (prowords));
     Store_field (res, 2, caml_copy_double (majwords));
-    Store_field (res, 3, Val_long (mincoll));
-    Store_field (res, 4, Val_long (majcoll));
-    Store_field (res, 5, Val_long (heap_words));
-    Store_field (res, 6, Val_long (heap_chunks));
-    Store_field (res, 7, Val_long (live_words));
-    Store_field (res, 8, Val_long (live_blocks));
-    Store_field (res, 9, Val_long (free_words));
-    Store_field (res, 10, Val_long (free_blocks));
-    Store_field (res, 11, Val_long (largest_free));
-    Store_field (res, 12, Val_long (fragments));
-    Store_field (res, 13, Val_long (cpct));
-    Store_field (res, 14, Val_long (top_heap_words));
-    Store_field (res, 15, Val_long (caml_stack_usage()));
+    Store_field (res, 3, Opt_val_long (mincoll));
+    Store_field (res, 4, Opt_val_long (majcoll));
+    Store_field (res, 5, Opt_val_long (heap_words));
+    Store_field (res, 6, Opt_val_long (heap_chunks));
+    Store_field (res, 7, Opt_val_long (live_words));
+    Store_field (res, 8, Opt_val_long (live_blocks));
+    Store_field (res, 9, Opt_val_long (free_words));
+    Store_field (res, 10, Opt_val_long (free_blocks));
+    Store_field (res, 11, Opt_val_long (largest_free));
+    Store_field (res, 12, Opt_val_long (fragments));
+    Store_field (res, 13, Opt_val_long (cpct));
+    Store_field (res, 14, Opt_val_long (top_heap_words));
+    Store_field (res, 15, Opt_val_long (caml_stack_usage()));
     CAMLreturn (res);
   }else{
     CAMLreturn (Val_unit);
@@ -300,19 +300,19 @@ CAMLprim value caml_gc_quick_stat(value v)
   Store_field (res, 0, caml_copy_double (minwords));
   Store_field (res, 1, caml_copy_double (prowords));
   Store_field (res, 2, caml_copy_double (majwords));
-  Store_field (res, 3, Val_long (mincoll));
-  Store_field (res, 4, Val_long (majcoll));
-  Store_field (res, 5, Val_long (heap_words));
-  Store_field (res, 6, Val_long (heap_chunks));
-  Store_field (res, 7, Val_long (0));
-  Store_field (res, 8, Val_long (0));
-  Store_field (res, 9, Val_long (0));
-  Store_field (res, 10, Val_long (0));
-  Store_field (res, 11, Val_long (0));
-  Store_field (res, 12, Val_long (0));
-  Store_field (res, 13, Val_long (cpct));
-  Store_field (res, 14, Val_long (top_heap_words));
-  Store_field (res, 15, Val_long (caml_stack_usage()));
+  Store_field (res, 3, Opt_val_long (mincoll));
+  Store_field (res, 4, Opt_val_long (majcoll));
+  Store_field (res, 5, Opt_val_long (heap_words));
+  Store_field (res, 6, Opt_val_long (heap_chunks));
+  Store_field (res, 7, Opt_val_long (0));
+  Store_field (res, 8, Opt_val_long (0));
+  Store_field (res, 9, Opt_val_long (0));
+  Store_field (res, 10, Opt_val_long (0));
+  Store_field (res, 11, Opt_val_long (0));
+  Store_field (res, 12, Opt_val_long (0));
+  Store_field (res, 13, Opt_val_long (cpct));
+  Store_field (res, 14, Opt_val_long (top_heap_words));
+  Store_field (res, 15, Opt_val_long (caml_stack_usage()));
   CAMLreturn (res);
 }
 
@@ -357,18 +357,18 @@ CAMLprim value caml_gc_get(value v)
   CAMLlocal1 (res);
 
   res = caml_alloc_tuple (8);
-  Store_field (res, 0, Val_long (caml_minor_heap_wsz));                 /* s */
-  Store_field (res, 1, Val_long (caml_major_heap_increment));           /* i */
-  Store_field (res, 2, Val_long (caml_percent_free));                   /* o */
-  Store_field (res, 3, Val_long (caml_verb_gc));                        /* v */
-  Store_field (res, 4, Val_long (caml_percent_max));                    /* O */
+  Store_field (res, 0, Opt_val_long (caml_minor_heap_wsz));                 /* s */
+  Store_field (res, 1, Opt_val_long (caml_major_heap_increment));           /* i */
+  Store_field (res, 2, Opt_val_long (caml_percent_free));                   /* o */
+  Store_field (res, 3, Opt_val_long (caml_verb_gc));                        /* v */
+  Store_field (res, 4, Opt_val_long (caml_percent_max));                    /* O */
 #ifndef NATIVE_CODE
-  Store_field (res, 5, Val_long (caml_max_stack_size));                 /* l */
+  Store_field (res, 5, Opt_val_long (caml_max_stack_size));                 /* l */
 #else
   Store_field (res, 5, Val_long (0));
 #endif
-  Store_field (res, 6, Val_long (caml_allocation_policy));              /* a */
-  Store_field (res, 7, Val_long (caml_major_window));                   /* w */
+  Store_field (res, 6, Opt_val_long (caml_allocation_policy));              /* a */
+  Store_field (res, 7, Opt_val_long (caml_major_window));                   /* w */
   CAMLreturn (res);
 }
 
@@ -549,7 +549,7 @@ CAMLprim value caml_gc_compaction(value v)
 
 CAMLprim value caml_get_minor_free (value v)
 {
-  return Val_int (caml_young_ptr - caml_young_alloc_start);
+  return Opt_val_long (caml_young_ptr - caml_young_alloc_start);
 }
 
 CAMLprim value caml_get_major_bucket (value v)

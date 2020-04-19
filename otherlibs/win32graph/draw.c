@@ -167,7 +167,7 @@ CAMLprim value caml_gr_point_color(value vx, value vy)
         b = (unsigned long)((rgb & 0xFF0000) >> 16);
         g = (unsigned long)((rgb & 0x00FF00) >> 8);
         r = (unsigned long)(rgb & 0x0000FF);
-        return Val_long((r<<16) + (g<<8) + b);
+        return Opt_val_long((r<<16) + (g<<8) + b);
 }
 
 CAMLprim value caml_gr_circle(value x,value y,value radius)
