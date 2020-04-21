@@ -404,13 +404,13 @@ static void intern_rec(value *dest)
     } else {
       switch(code) {
       case CODE_INT8:
-        v = Val_long(read8s());
+        v = Opt_val_long(read8s());
         break;
       case CODE_INT16:
-        v = Val_long(read16s());
+        v = Opt_val_long(read16s());
         break;
       case CODE_INT32:
-        v = Val_long(read32s());
+        v = Opt_val_long(read32s());
         break;
       case CODE_INT64:
 #ifdef ARCH_SIXTYFOUR

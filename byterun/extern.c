@@ -756,7 +756,7 @@ CAMLprim value caml_output_value_to_buffer(value buf, value ofs, value len,
   intnat l =
     caml_output_value_to_block(v, flags,
                                &Byte(buf, Long_val(ofs)), Long_val(len));
-  return Val_long(l);
+  return Opt_val_long(l);
 }
 
 CAMLexport void caml_output_value_to_malloc(value v, value flags,

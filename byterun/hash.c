@@ -294,7 +294,7 @@ CAMLprim value caml_hash_univ_param(value count, value limit, value obj)
   h.univ_count = Long_val(count);
   h.accu = 0;
   hash_aux(&h, obj);
-  return Val_long(h.accu & 0x3FFFFFFF);
+  return Opt_val_long(h.accu & 0x3FFFFFFF);
   /* The & has two purposes: ensure that the return value is positive
      and give the same result on 32 bit and 64 bit architectures. */
 }

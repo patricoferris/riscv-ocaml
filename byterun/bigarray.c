@@ -591,7 +591,7 @@ value caml_ba_get_N(value vb, value * vind, int nind)
   case CAML_BA_NATIVE_INT:
     return caml_copy_nativeint(((intnat *) b->data)[offset]);
   case CAML_BA_CAML_INT:
-    return Val_long(((intnat *) b->data)[offset]);
+    return Opt_val_long(((intnat *) b->data)[offset]);
   case CAML_BA_COMPLEX32:
     { float * p = ((float *) b->data) + offset * 2;
       return copy_two_doubles(p[0], p[1]); }
@@ -865,7 +865,7 @@ CAMLprim value caml_ba_uint8_set64(value vb, value vind, value newval)
 CAMLprim value caml_ba_num_dims(value vb)
 {
   struct caml_ba_array * b = Caml_ba_array_val(vb);
-  return Val_long(b->num_dims);
+  return Opt_val_long(b->num_dims);
 }
 
 /* Return the n-th dimension of a big array */
@@ -875,7 +875,7 @@ CAMLprim value caml_ba_dim(value vb, value vn)
   struct caml_ba_array * b = Caml_ba_array_val(vb);
   intnat n = Long_val(vn);
   if (n < 0 || n >= b->num_dims) caml_invalid_argument("Bigarray.dim");
-  return Val_long(b->dim[n]);
+  return Opt_val_long(b->dim[n]);
 }
 
 CAMLprim value caml_ba_dim_1(value vb)

@@ -42,7 +42,7 @@ CAMLprim value caml_ml_string_length(value s)
   mlsize_t temp;
   temp = Bosize_val(s) - 1;
   CAMLassert (Byte (s, temp - Byte (s, temp)) == 0);
-  return Val_long(temp - Byte (s, temp));
+  return Opt_val_long(temp - Byte (s, temp));
 }
 
 CAMLprim value caml_ml_bytes_length(value s)
