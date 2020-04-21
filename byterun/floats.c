@@ -335,7 +335,7 @@ CAMLprim value caml_float_of_string(value vs)
 
 CAMLprim value caml_int_of_float(value f)
 {
-  return Val_long((intnat) Double_val(f));
+  return Opt_val_long((intnat) Double_val(f));
 }
 
 CAMLprim value caml_float_of_int(value n)
