@@ -27,9 +27,10 @@ type specific_operation =
   | Iocval of int                       (* shift logical left 1 and add immediate (1 for OCaml value) *)
   | Iocadd                              (* OCaml integer adding - automatically subtracts 1 *)
   | Iocsub                              (* OCaml integer subtraction - automatically adds 1 *)
+  | Ioclea                              (* A load-effective address for OCaml *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Ioceq _ | Iocval _ | Iocadd | Iocsub -> false
+  | Imultaddf _ | Imultsubf _ | Ioceq _ | Iocval _ | Iocadd | Iocsub | Ioclea -> false
 
 (* Addressing modes *)
 
@@ -97,6 +98,7 @@ let print_specific_operation printreg op ppf arg =
         printreg arg.(0) n 
   | Iocval n -> fprintf ppf "%a << 1 + %i" 
         printreg arg.(0) n
+  | Ioclea -> fprintf ppf "%a << 2 + %a" printreg arg.(0) printreg arg.(1)
   
 (* Configuring Extensions *)
 type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool }
