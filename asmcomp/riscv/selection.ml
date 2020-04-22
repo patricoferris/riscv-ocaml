@@ -86,15 +86,13 @@ method! emit_tail (env:Selectgen.environment) exp =
   match exp with 
   | (Cifthenelse (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
     if rvconfig.iszero then (
-      match Selectgen.env_find ident env with 
-        | None -> () 
-        | Some rarg -> 
-          let ret = self#regs_for typ_int in 
-          let r = self#insert_op (Ispecific(Ioceq 1)) rarg ret in 
-          let r = self#insert_op (Ispecific(Iocval 1)) r ret in
-          let loc = Proc.loc_results r in
-            self#insert_moves r loc;
-            self#insert Ireturn loc [||]
+      let rarg = Selectgen.env_find ident env in
+      let ret = self#regs_for typ_int in 
+      let r = self#insert_op (Ispecific(Ioceq 1)) rarg ret in 
+      let r = self#insert_op (Ispecific(Iocval 1)) r ret in
+      let loc = Proc.loc_results r in
+        self#insert_moves r loc;
+        self#insert Ireturn loc [||]
     ) else (
       super#emit_tail env exp
     )
