@@ -255,6 +255,7 @@ let name_for_specific = function
   | Iocval _        -> "ocvali"
   | Iocadd          -> "ocadd"
   | Iocsub          -> "ocsub"
+  | Ioclea          -> "oclea"
 
 (* Name of current function *)
 let function_name = ref ""
@@ -438,7 +439,7 @@ let emit_instr i =
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int n}\n`
           | Iocval n -> 
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_int n}\n`
-          | Iocadd | Iocsub -> 
+          | Iocadd | Iocsub | Ioclea -> 
             `	{emit_string instr}	{emit_reg i.res.(0)}, {emit_reg i.arg.(0)}, {emit_reg i.arg.(1)}\n`
           | _ -> 
             let instr = name_for_specific sop in

@@ -61,6 +61,9 @@ method! select_operation op args dbg =
     (Ispecific Iocsub, [arg1; arg2])
   | (Caddi, [Cop(Clsl, [arg1; Cconst_int 1], _); Cconst_int n]) 
       when rvconfig.shiftadd && self#is_immediate n -> (Ispecific (Iocval n), [arg1])
+  | (Cadda, [arg2; Cop(Clsl, [arg1; Cconst_int 2], _)])
+  | (Cadda, [Cop(Clsl, [arg1; Cconst_int 2], _); arg2]) ->
+    (Ispecific Ioclea, [arg1; arg2])
   | _ ->
       super#select_operation op args dbg
 
