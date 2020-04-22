@@ -519,7 +519,8 @@ let emit_instr i =
       let lbl = new_label() in
         if (mk_config !Clflags.riscv_arch).jtbl then (
           `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
-          `	ocjmp	x0, {emit_reg i.arg.(0)}, {emit_reg reg_tmp1}\n`;
+          `	oclea	{emit_reg reg_tmp1}, {emit_reg i.arg.(0)}, {emit_reg reg_tmp1}\n`;
+          `	jr	{emit_reg reg_tmp1}\n`;
           `{emit_label lbl}:\n`
         ) else (
           `	la	{emit_reg reg_tmp1}, {emit_label lbl}\n`;
