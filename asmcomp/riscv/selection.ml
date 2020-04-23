@@ -84,7 +84,7 @@ method! select_condition = function
 (* Emitting Custom Instructions *)
 method! emit_tail (env:Selectgen.environment) exp = 
   match exp with 
-  | (Cifthenelse (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
+  | (Cifthenelse (Cop(Ccmpi Cne, [Cvar ident; Cconst_int 1], _debug), Cconst_pointer 1, Cconst_pointer 3)) -> 
     if rvconfig.iszero then (
       let rarg = Selectgen.env_find ident env in
       let ret = self#regs_for typ_int in 
