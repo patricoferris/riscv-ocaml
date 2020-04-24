@@ -55,11 +55,11 @@ method! select_operation op args dbg =
   (* RISC-V Custom OCaml Extensions *)
   (* Bit Manipulation examples *)
   (* ANDN: (and a (or (xor b -1) 1)) *)
-  (* ORN:  (or a (or (xor b -1) 1)) *)
+  (* ORN:  (or a  (or (xor b -1) 1)) *)
   (* XORN: (or (xor a (xor b -1)) 1)) *)
   | (Cand, [arg1; Cop(Cor, [Cop(Cxor, [arg2; Cconst_int -1], _debug); Cconst_int 1], _)]) when rvconfig.bitmanip -> 
     (Ispecific Iandn, [arg1; (Cop(Cxor, [arg2; Cconst_int 1], _debug))])
-  | (Cor, [Cop(Cor, [arg1; Cop(Xor, [arg2; Cconst_int -1], _)], _); Cconst_int 1]) when rvconfig.bitmanip -> 
+  | (Cor, [Cop(Cor, [arg1; Cop(Cxor, [arg2; Cconst_int -1], _)], _); Cconst_int 1]) when rvconfig.bitmanip -> 
     (Ispecific Iorn, [arg1; arg2])
   | (Cor, [Cop(Cxor, [arg1; Cop(Cxor, [arg2; Cconst_int -1], _)], _); Cconst_int 1]) when rvconfig.bitmanip -> 
     (Ispecific Ixorn, [arg1; arg2])
