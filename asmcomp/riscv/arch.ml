@@ -103,10 +103,11 @@ let print_specific_operation printreg op ppf arg =
 (* Configuring Extensions *)
 type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool }
 let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false; shiftadd = false}
+let full_config = {iszero = true; arith = true; bitmanip = true; jtbl = true; shiftadd = true}
 
 let mk_config = function 
-  | None -> empty_config 
-  | Some s -> 
+  | None -> full_config 
+  | Some s -> if String.equal s "none" then empty_config else 
     let matching conf = function 
       | 'z' -> {conf with iszero = true}
       | 'a' -> {conf with arith = true}
