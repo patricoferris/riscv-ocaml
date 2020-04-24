@@ -28,9 +28,13 @@ type specific_operation =
   | Iocadd                              (* OCaml integer adding - automatically subtracts 1 *)
   | Iocsub                              (* OCaml integer subtraction - automatically adds 1 *)
   | Ioclea                              (* A load-effective address for OCaml *)
+  | Iandn                               (* Logic-with-negate and *)
+  | Iorn                                (* Logic-with-negate or *)
+  | Ixorn                               (* Logic-with-negate xor *)
 
 let spacetime_node_hole_pointer_is_live_before = function
-  | Imultaddf _ | Imultsubf _ | Ioceq _ | Iocval _ | Iocadd | Iocsub | Ioclea -> false
+  | Imultaddf _ | Imultsubf _ | Ioceq _ | Iocval _ | Iocadd | Iocsub | Ioclea 
+  | Iandn | Iorn | Ixorn -> false
 
 (* Addressing modes *)
 
@@ -99,6 +103,9 @@ let print_specific_operation printreg op ppf arg =
   | Iocval n -> fprintf ppf "%a << 1 + %i" 
         printreg arg.(0) n
   | Ioclea -> fprintf ppf "%a << 2 + %a" printreg arg.(0) printreg arg.(1)
+  | Iandn -> fprintf ppf "%a & ~%a" printreg arg.(0) printreg arg.(1)
+  | Iorn  -> fprintf ppf "%a | ~%a" printreg arg.(0) printreg arg.(1)
+  | Ixorn -> fprintf ppf "%a ^ ~%a" printreg arg.(0) printreg arg.(1)
   
 (* Configuring Extensions *)
 type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool }
@@ -106,7 +113,7 @@ let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = fals
 let full_config = {iszero = true; arith = true; bitmanip = true; jtbl = true; shiftadd = true}
 
 let mk_config = function 
-  | None -> full_config 
+  | None -> { full_config with bitmanip = false }
   | Some s -> if String.equal s "none" then empty_config else 
     let matching conf = function 
       | 'z' -> {conf with iszero = true}

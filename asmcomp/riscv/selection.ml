@@ -53,15 +53,28 @@ method! select_operation op args dbg =
   | (Ccmpa comp, args) -> (Iintop(Icomp (Iunsigned comp)), args)
   | (Cmuli, _) -> (Iintop Imul, args)
   (* RISC-V Custom OCaml Extensions *)
+  (* Bit Manipulation examples *)
+  (* ANDN: (and a (or (xor b -1) 1)) *)
+  (* ORN:  (or a (or (xor b -1) 1)) *)
+  (* XORN: (or (xor a (xor b -1)) 1)) *)
+  | (Cand, [arg1; Cop(Cor, [Cop(Xor, [arg2; Cconst_int -1], _debug); Cconst_int 1], _)]) when rvconfig.bitmanip -> 
+    (Ispecific Iandn, [arg1; (Cop(Cxor, [arg2; Cconst_int 1], _debug))])
+  | (Cor, [Cop(Cor, [arg1; Cop(Xor, [arg2; Cconst_int -1], _)], _); Cconst_int 1]) when rvconfig.bitmanip -> 
+    (Ispecific Iorn, [arg1; arg2])
+  | (Cor, [Cop(Cxor, [arg1; Cop(Xor, [arg2; Cconst_int -1], _)], _); Cconst_int 1]) when rvconfig.bitmanip -> 
+    (Ispecific Ixorn, [arg1; arg2])
+  (* Optimised Arithmetic *)
   | (Caddi, [Cop(Caddv, [arg1; arg2], _); Cconst_int -1])
   | (Caddi, [Cop(Cadda, [arg1; arg2], _); Cconst_int -1])
   | (Caddi, [Cop(Caddi, [arg1; arg2], _); Cconst_int -1]) when rvconfig.arith -> 
     (Ispecific Iocadd, [arg1; arg2])
   | (Caddi, [Cop(Csubi, [arg1; arg2], _); Cconst_int 1]) when rvconfig.arith -> 
     (Ispecific Iocsub, [arg1; arg2])
+  (* Optimised OCaml values *)
   | (Caddi, [Cop(Clsl, [arg1; Cconst_int 1], _); Cconst_int n]) 
       when rvconfig.shiftadd && self#is_immediate n -> (Ispecific (Iocval n), [arg1])
   | (Cadda, [arg2; Cop(Clsl, [arg1; Cconst_int 2], _)])
+  (* Load-effective Immediate *)
   | (Cadda, [Cop(Clsl, [arg1; Cconst_int 2], _); arg2]) when rvconfig.jtbl ->
     (Ispecific Ioclea, [arg1; arg2])
   | _ ->
