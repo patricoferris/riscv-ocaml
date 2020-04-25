@@ -565,9 +565,25 @@ let emit_instr i =
 (* Emit a sequence of instructions *)
 
 let rec emit_all = function
-  | {desc = Lend} -> () | i -> emit_instr i; emit_all i.next
+  | {desc = Lend} -> () 
+  | {desc = Lreloadretaddr; next = {desc = Lreturn}} when (mk_config !Clflags.riscv_arch).func -> 
+    let n = frame_size () in 
+    if self#is_immediate n then begin 
+     `	ocfex	sp, sp, {emit_int n}\n`;
+     `	ret\n`;
+      emit_all i.next.next 
+    end else emit_instr i; emit_all i.next
+  | i -> emit_instr i; emit_all i.next
 
 (* Emission of a function declaration *)
+
+let func_entry n =
+  if self#is_immediate n && rvconfig.func && !contains_calls then 
+    `	ocfet	sp, sp, {emit_int n}\n`;;
+  else begin 
+    emit_stack_adjustment (-n);
+    if !contains_calls then store_ra n
+  end 
 
 let fundecl fundecl =
   function_name := fundecl.fun_name;
@@ -582,8 +598,7 @@ let fundecl fundecl =
   `	.align	2\n`;
   `{emit_symbol fundecl.fun_name}:\n`;
   let n = frame_size() in
-  emit_stack_adjustment (-n);
-  if !contains_calls then store_ra n;
+  func_entry n; 
   `{emit_label !tailrec_entry_point}:\n`;
   emit_all fundecl.fun_body;
   List.iter emit_call_gc !call_gc_sites;

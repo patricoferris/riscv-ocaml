@@ -108,9 +108,9 @@ let print_specific_operation printreg op ppf arg =
   | Ixorn -> fprintf ppf "%a ^ ~%a" printreg arg.(0) printreg arg.(1)
   
 (* Configuring Extensions *)
-type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool }
-let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false; shiftadd = false}
-let full_config = {iszero = true; arith = true; bitmanip = true; jtbl = true; shiftadd = true}
+type rvconfig = { iszero : bool; arith : bool; bitmanip : bool; jtbl : bool; shiftadd : bool; func : bool}
+let empty_config = {iszero = false; arith = false; bitmanip = false; jtbl = false; shiftadd = false; func = false}
+let full_config = {iszero = true; arith = true; bitmanip = true; jtbl = true; shiftadd = true; func = true}
 
 let mk_config = function 
   | None -> { full_config with bitmanip = false }
@@ -121,6 +121,7 @@ let mk_config = function
       | 'b' -> {conf with bitmanip = true}
       | 'j' -> {conf with jtbl = true}
       | 's' -> {conf with shiftadd = true}
+      | 'f' -> {conf with func = true}
       |  _  -> conf
     in 
       Seq.fold_left matching empty_config (String.to_seq s)
