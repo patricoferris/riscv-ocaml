@@ -578,7 +578,7 @@ let rec emit_all = function
 (* Emission of a function declaration *)
 
 let func_entry n =
-  if is_immediate n && rvconfig.func && !contains_calls then 
+  if is_immediate n && (mk_config !Clflags.riscv_arch).func && !contains_calls then 
     `	ocfet	sp, sp, {emit_int n}\n`
   else begin 
     emit_stack_adjustment (-n);
