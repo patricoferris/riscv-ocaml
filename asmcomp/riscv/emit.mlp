@@ -579,7 +579,7 @@ let rec emit_all = function
 
 let func_entry n =
   if self#is_immediate n && rvconfig.func && !contains_calls then 
-    `	ocfet	sp, sp, {emit_int n}\n`;;
+    `	ocfet	sp, sp, {emit_int n}\n`
   else begin 
     emit_stack_adjustment (-n);
     if !contains_calls then store_ra n
