@@ -566,7 +566,7 @@ let emit_instr i =
 
 let rec emit_all = function
   | {desc = Lend} -> () 
-  | {desc = Lreloadretaddr; next = {desc = Lreturn}} when (mk_config !Clflags.riscv_arch).func -> 
+  | {desc = Lreloadretaddr; next = {desc = Lreturn}} as i when (mk_config !Clflags.riscv_arch).func -> 
     let n = frame_size () in 
     if is_immediate n then begin 
      `	ocfex	sp, sp, {emit_int n}\n`;
