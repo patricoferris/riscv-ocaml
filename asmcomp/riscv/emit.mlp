@@ -569,7 +569,7 @@ let rec emit_all = function
   | {desc = Lreloadretaddr; next = {desc = Lreturn}} as i when (mk_config !Clflags.riscv_arch).func -> 
     let n = frame_size () in 
     if is_immediate n then begin 
-      print_string print_string "======================LRR AND ENTRY===========================\n";
+      print_string "======================LRR AND ENTRY===========================\n";
       Printlinear.instr Format.std_formatter i; print_string "\n";
       Printlinear.instr Format.std_formatter i.next; print_string "\n";
       Printlinear.instr Format.std_formatter i.next.next; print_string "\n";
