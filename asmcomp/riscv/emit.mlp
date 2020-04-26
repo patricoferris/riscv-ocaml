@@ -588,8 +588,8 @@ let func_entry n =
     `	ocfet	sp, sp, {emit_int n}\n`
   end
   else begin 
-    emit_stack_adjustment (-n);
-    if !contains_calls then store_ra n
+    emit_stack_adjustment n;
+    if !contains_calls then store_ra (-n)
   end 
 
 let fundecl fundecl =
