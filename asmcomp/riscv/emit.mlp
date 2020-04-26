@@ -585,7 +585,7 @@ let rec emit_all = function
 
 let func_entry n =
   if is_immediate n && (mk_config !Clflags.riscv_arch).func && !contains_calls then begin
-    `	ocfet	sp, sp, {emit_int -n}\n`
+    `	ocfet	sp, sp, {emit_int n}\n`
   end
   else begin 
     emit_stack_adjustment (-n);
@@ -605,7 +605,7 @@ let fundecl fundecl =
   `	.align	2\n`;
   `{emit_symbol fundecl.fun_name}:\n`;
   let n = frame_size() in
-  func_entry n; 
+  func_entry (-n); 
   `{emit_label !tailrec_entry_point}:\n`;
   emit_all fundecl.fun_body;
   List.iter emit_call_gc !call_gc_sites;
